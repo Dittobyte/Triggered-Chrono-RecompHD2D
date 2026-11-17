@@ -448,7 +448,8 @@ static int child_wait(child *c)
     return WIFEXITED(st) ? WEXITSTATUS(st) : 128 + (WIFSIGNALED(st) ? WTERMSIG(st) : 0);
 }
 #endif
- read so far to on_line. Returns 1 at EOF. */
+
+/* Hand each complete line read so far to on_line. Returns 1 at EOF. */
 static int child_read(child *c, void (*on_line)(char *))
 {
     for (;;) {
