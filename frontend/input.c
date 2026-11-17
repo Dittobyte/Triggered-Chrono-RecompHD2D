@@ -204,6 +204,30 @@ int quit_combo_masks(const quit_combo *q)
     return q->state != QC_IDLE;
 }
 
+/* port: pad_leds (settings.ini): "auto" lets a pad show its player
+   number and colour; "off" turns the vendor drivers' player-LED hints
+   off (SDL's default is on) and the game sets no colour. */
+static int pad_leds_on = 1;
+
+static void input_pad_leds_hints(void)
+{
+    const char *v = pad_leds_on ? "1" : "0";
+#ifdef SDL_HINT_JOYSTICK_HIDAPI_PS5_PLAYER_LED
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_PLAYER_LED, v);
+#endif
+#ifdef SDL_HINT_JOYSTICK_HIDAPI_SWITCH_PLAYER_LED
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_SWITCH_PLAYER_LED, v);
+#endif
+#ifdef SDL_HINT_JOYSTICK_HIDAPI_XBOX_360_PLAYER_LED
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_XBOX_360_PLAYER_LED, v);
+#endif
+}
+
+int input_pad_leds(void)
+{
+    return pad_leds_on;
+}
+
 /* port: controller hints (input.h). SDL_SetHint at normal priority: an
    environment variable of the same name beats it. */
 void input_sdl_hints(int native_steam)
@@ -216,6 +240,15 @@ void input_sdl_hints(int native_steam)
     (void)native_steam;
 #endif
     SDL_SetHint(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS, "0");
+    /* Joy-Cons: a left and a right one are one pad; a single one is not
+       turned on its side. Each hint is missing from older SDL 2 headers. */
+#ifdef SDL_HINT_JOYSTICK_HIDAPI_COMBINE_JOY_CONS
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_COMBINE_JOY_CONS, "1");
+#endif
+#ifdef SDL_HINT_JOYSTICK_HIDAPI_VERTICAL_JOY_CONS
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_VERTICAL_JOY_CONS, "0");
+#endif
+    input_pad_leds_hints();
 }
 
 int input_under_steam_input(const char **why)
@@ -263,6 +296,13 @@ static int get_swap_xy(void *u) { (void)u; return swap_xy; }
 static void set_swap_xy(void *u, int v) { (void)u; swap_xy = v != 0; }
 static int get_deadzone(void *u) { (void)u; return deadzone_pct; }
 static void set_deadzone(void *u, int v) { (void)u; input_deadzone_set(v); }
+static int get_pad_leds(void *u) { (void)u; return pad_leds_on; }
+static void set_pad_leds(void *u, int v)
+{
+    (void)u;
+    pad_leds_on = v != 0;
+    input_pad_leds_hints();   /* for pads opened from now on */
+}
 
 void input_register_settings(void)
 {
@@ -280,4 +320,12 @@ void input_register_settings(void)
         .type = SETTING_INT, .min = INPUT_DEADZONE_MIN, .max = INPUT_DEADZONE_MAX, .step = 1,
         .format = "%d%%", .get = get_deadzone, .set = set_deadzone,
         .help = "How far the left stick must tilt to walk. Lower: more sensitive."});
+    static const char *const led_opts[] = {"Off", "Auto"}, *const led_vals[] = {"off", "auto"};
+    settings_register(&(setting){
+        .key = "pad_leds", .label = "Controller lights", .category = "Controls",
+        .type = SETTING_ENUM, .options = led_opts, .values = led_vals, .count = 2,
+        .get = get_pad_leds, .set = set_pad_leds,
+        .help = "Auto: a PlayStation, Switch or Xbox 360 pad shows its player number, and a pad "
+                "with a light bar takes a colour per player. Off: the game leaves the lights "
+                "alone."});
 }
