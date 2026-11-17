@@ -51,6 +51,14 @@ endif()
 
 set(CT_WARN -Wall -Wextra -Wpedantic)
 
+# port: 64-bit Windows (MinGW, MSYS2 UCRT64; .github/workflows/port.yml). Our
+# own context switch runs the coroutines on stacks Windows doesn't know, so
+# setjmp must not record a frame for longjmp to unwind (runtime/compat/
+# ucontext_win32.c). SDL_MAIN_HANDLED: main stays main, no SDL2main to link.
+if(WIN32)
+    add_compile_definitions(__USE_MINGW_SETJMP_NON_SEH SDL_MAIN_HANDLED)
+endif()
+
 enable_testing()
 
 # The translator (recomp/), runtime, frontend, and engine tests are
@@ -70,6 +78,7 @@ add_library(ct_runtime STATIC runtime/cpu.c runtime/bus.c
     runtime/cycles.c runtime/replay.c runtime/resample.c
     runtime/spc700_host.cpp
     runtime/func_table.c runtime/module.c   # port: table indirection, game modules
+    runtime/platform.c   # port: dlopen / rename / home folder across POSIX and Windows
     runtime/rumble.c   # port: simulated rumble
     runtime/sha1.c   # port: ROM identity (first run, save states)
     runtime/savestate_io.c)   # port: save states' serialization
@@ -87,7 +96,7 @@ int main(void) { static char s[65536]; getcontext(&b); b.uc_stack.ss_sp = s;
     b.uc_stack.ss_size = sizeof s; b.uc_link = 0; makecontext(&b, f, 0);
     return swapcontext(&a, &b); }
 ]=] CT_HAVE_MAKECONTEXT)
-if(ANDROID OR NOT CT_HAVE_MAKECONTEXT)
+if(ANDROID OR WIN32 OR NOT CT_HAVE_MAKECONTEXT)
     set(ct_compat_default ON)
 else()
     set(ct_compat_default OFF)
@@ -95,7 +104,7 @@ endif()
 option(CT_COMPAT_UCONTEXT "Use runtime/compat's context switch, not <ucontext.h>" ${ct_compat_default})
 if(CT_COMPAT_UCONTEXT)
     target_sources(ct_runtime PRIVATE runtime/compat/ucontext_aarch64.c
-        runtime/compat/ucontext_x86_64.c)
+        runtime/compat/ucontext_x86_64.c runtime/compat/ucontext_win32.c)
     target_compile_definitions(ct_runtime PUBLIC CT_COMPAT_UCONTEXT)
     message(STATUS "CT_COMPAT_UCONTEXT: runtime/compat context switch")
 endif()
@@ -346,7 +355,12 @@ if(CT_ANDROID)
     target_compile_options(main PRIVATE ${CT_WARN})
     return()   # no tests, games or install() rules on Android
 endif()
-ct_engine_exe(ct_boot_engine ${CMAKE_SOURCE_DIR}/tools/ct_boot.c ${CMAKE_SOURCE_DIR}/tools/tas_resync.c)
+if(WIN32)   # port: tas_resync.c forks and maps files: Linux only (tas_resync_stub.c)
+    set(CT_RESYNC_SRC ${CMAKE_SOURCE_DIR}/tools/tas_resync_stub.c)
+else()
+    set(CT_RESYNC_SRC ${CMAKE_SOURCE_DIR}/tools/tas_resync.c)
+endif()
+ct_engine_exe(ct_boot_engine ${CMAKE_SOURCE_DIR}/tools/ct_boot.c ${CT_RESYNC_SRC})
 target_link_libraries(ct_boot_engine ct_packs)   # port: --music-pack (music.h)
 if(SDL2_FOUND)
     # port: without --module it runs the first-run flow (frontend/firstrun.h):

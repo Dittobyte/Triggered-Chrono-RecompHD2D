@@ -53,6 +53,35 @@ jobs:
           done
           exit $status
 
+  # port: the engine on 64-bit Windows (MSYS2 UCRT64, MinGW-w64). Same
+  # engine-only tree and ROM-free tests as `build`; no game, no ROM.
+  windows:
+    name: engine-only build and tests (Windows)
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-SDL2
+            mingw-w64-ucrt-x86_64-python
+      - name: Configure
+        run: |
+          unset CT_ROM
+          cmake -S . -B build -G Ninja -DCT_ENGINE_ONLY=ON -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+      - name: Build
+        run: cmake --build build -j "$(nproc)"
+      - name: Test
+        run: ctest --test-dir build -LE rom --output-on-failure
+
   lint:
     name: lint (game-agnostic, REUSE)
     runs-on: ubuntu-latest

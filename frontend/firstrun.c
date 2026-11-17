@@ -3,8 +3,8 @@
  *
  * First run of an engine-only build (firstrun.h). Everything game-specific
  * comes from DATA_DIR/game/GAME_ID/game.toml: the title shown, the ROM's
- * size and its SHA-1. POSIX only, like the module loader (fork, exec,
- * pipes). */
+ * size and its SHA-1. The build tool runs as a child process on a pipe:
+ * fork and exec on POSIX, CreateProcess on Windows (child_*). */
 #include "firstrun.h"
 
 #include <dirent.h>
@@ -15,10 +15,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
 #include <unistd.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <strings.h>
+#include <sys/wait.h>
+#endif
 
 #include <SDL.h>
 
@@ -28,6 +32,7 @@
 #include "hid_deck.h"   /* port: InputPlumber's Deck pad */
 #include "module.h"
 #include "sched.h"
+#include "platform.h"   /* port: ct_home; Windows: realpath, rename... */
 #include "sha1.h"
 
 #define W SCHED_WIDTH
@@ -275,9 +280,112 @@ static int read_game_toml(const char *path)
 static const char *python(void)
 {
     const char *p = getenv("CT_PYTHON");
+#ifdef _WIN32
+    return p && *p ? p : "python";   /* python.org and the Store install python, not python3 */
+#else
     return p && *p ? p : "python3";
+#endif
 }
 
+#ifdef _WIN32
+typedef struct {
+    HANDLE proc;
+    HANDLE rd;
+    char buf[2048];
+    size_t len;
+} child;
+
+/* argv as one command line, each argument quoted by the rules of
+   CommandLineToArgvW (backslashes only count before a quote). */
+static int cmdline(char *out, size_t n, char *const argv[])
+{
+    size_t o = 0;
+#define PUT(ch) do { if (o + 1 >= n) return -1; out[o++] = (ch); } while (0)
+    for (int k = 0; argv[k]; k++) {
+        if (k)
+            PUT(' ');
+        PUT('"');
+        size_t bs = 0;
+        for (const char *a = argv[k]; *a; a++) {
+            if (*a == '\\') {
+                bs++;
+                continue;
+            }
+            if (*a == '"')
+                bs = bs * 2 + 1;
+            for (; bs; bs--)
+                PUT('\\');
+            PUT(*a);
+        }
+        for (bs *= 2; bs; bs--)
+            PUT('\\');
+        PUT('"');
+    }
+#undef PUT
+    out[o] = 0;
+    return 0;
+}
+
+/* Start argv with its stdout and stderr on a pipe. */
+static int child_start(child *c, char *const argv[])
+{
+    char line[8192];
+    if (cmdline(line, sizeof line, argv))
+        return -1;
+    SECURITY_ATTRIBUTES sa = {sizeof sa, NULL, TRUE};
+    HANDLE rd, wr;
+    if (!CreatePipe(&rd, &wr, &sa, 0))
+        return -1;
+    SetHandleInformation(rd, HANDLE_FLAG_INHERIT, 0);
+    STARTUPINFOA si;
+    memset(&si, 0, sizeof si);
+    si.cb = sizeof si;
+    si.dwFlags = STARTF_USESTDHANDLES;
+    si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    si.hStdOutput = wr;
+    si.hStdError = wr;
+    PROCESS_INFORMATION pi;
+    BOOL ok = CreateProcessA(NULL, line, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+    CloseHandle(wr);
+    if (!ok) {
+        CloseHandle(rd);
+        return -1;
+    }
+    CloseHandle(pi.hThread);
+    c->proc = pi.hProcess;
+    c->rd = rd;
+    c->len = 0;
+    return 0;
+}
+
+/* Bytes read, 0 at the end of the output, -1 when none are ready yet. */
+static long child_recv(child *c, char *buf, size_t n)
+{
+    DWORD avail = 0, got = 0;
+    if (!PeekNamedPipe(c->rd, NULL, 0, NULL, &avail, NULL))
+        return 0;   /* the child and its handles are gone: the end */
+    if (!avail)
+        return -1;
+    if (!ReadFile(c->rd, buf, avail < n ? avail : (DWORD)n, &got, NULL))
+        return 0;
+    return (long)got;
+}
+
+static void child_kill(child *c)
+{
+    TerminateProcess(c->proc, 1);
+}
+
+static int child_wait(child *c)
+{
+    DWORD code = 1;
+    CloseHandle(c->rd);
+    WaitForSingleObject(c->proc, INFINITE);
+    GetExitCodeProcess(c->proc, &code);
+    CloseHandle(c->proc);
+    return (int)code;
+}
+#else
 typedef struct {
     pid_t pid;
     int fd;
@@ -317,15 +425,38 @@ static int child_start(child *c, char *const argv[])
     return 0;
 }
 
-/* Hand each complete line read so far to on_line. Returns 1 at EOF. */
+/* Bytes read, 0 at the end of the output, -1 when none are ready yet. */
+static long child_recv(child *c, char *buf, size_t n)
+{
+    ssize_t r = read(c->fd, buf, n);
+    if (r < 0)
+        return errno == EAGAIN || errno == EINTR ? -1 : 0;
+    return (long)r;
+}
+
+static void child_kill(child *c)
+{
+    kill(c->pid, SIGTERM);
+}
+
+static int child_wait(child *c)
+{
+    int st = 0;
+    close(c->fd);
+    while (waitpid(c->pid, &st, 0) < 0 && errno == EINTR)
+        ;
+    return WIFEXITED(st) ? WEXITSTATUS(st) : 128 + (WIFSIGNALED(st) ? WTERMSIG(st) : 0);
+}
+#endif
+ read so far to on_line. Returns 1 at EOF. */
 static int child_read(child *c, void (*on_line)(char *))
 {
     for (;;) {
         if (c->len >= sizeof c->buf - 1)   /* can't happen (flushed below); keeps the size sane */
             c->len = 0;
-        ssize_t n = read(c->fd, c->buf + c->len, sizeof c->buf - 1 - c->len);
+        long n = child_recv(c, c->buf + c->len, sizeof c->buf - 1 - c->len);
         if (n < 0)
-            return errno == EAGAIN || errno == EINTR ? 0 : 1;
+            return 0;
         int eof = n == 0;
         c->len += (size_t)n;
         char *start = c->buf, *nl;
@@ -344,15 +475,6 @@ static int child_read(child *c, void (*on_line)(char *))
         if (eof)
             return 1;
     }
-}
-
-static int child_wait(child *c)
-{
-    int st = 0;
-    close(c->fd);
-    while (waitpid(c->pid, &st, 0) < 0 && errno == EINTR)
-        ;
-    return WIFEXITED(st) ? WEXITSTATUS(st) : 128 + (WIFSIGNALED(st) ? WTERMSIG(st) : 0);
 }
 
 static void log_line(char *line)
@@ -480,7 +602,7 @@ static void scan_add(const char *a, const char *b)
 
 static void scan_dirs_init(void)
 {
-    const char *home = getenv("HOME");
+    const char *home = ct_home();
     n_scan_dirs = 0;
     scan_app = -1;
     scan_add(getenv("XDG_DOCUMENTS_DIR"), NULL);
@@ -629,7 +751,7 @@ static int wait_for_drop(char *path, size_t n, const char *problem)
         scr_clear("No ROM found. Put your ROM file in:", C_TEXT);
         /* The folders, short: relative to the home folder (the font has
            no ~). The last one, the per-game folder, isn't shown. */
-        const char *home = getenv("HOME");
+        const char *home = ct_home();
         size_t hl = home ? strlen(home) : 0;
         char where[1024] = "", app[PATHLEN] = "";
         for (int k = 0; k < n_scan_dirs - 1; k++) {
@@ -793,7 +915,7 @@ static int build(const char *rom)
         pump(&e);
         SDL_free(e.drop);
         if (e.quit) {
-            kill(c.pid, SIGTERM);
+            child_kill(&c);
             child_wait(&c);
             return FIRSTRUN_QUIT;
         }
