@@ -1,49 +1,149 @@
-<p align="center"><img src="packaging/branding/triggered-chrono-stacked.png" alt="Triggered Chrono" width="420"></p>
-
 # Triggered Chrono
 
-An unofficial, fan-made static recompilation of Chrono Trigger (SNES, US 1.0) into a native
-PC port, built on
-[ct-recomp](https://github.com/ThisIsAkill/ct-recomp) by Akhil Moola.
+**Chrono Trigger, rebuilt as a native PC game from your own copy, with an optional HD-2D look.**
+Not an emulator wrapper: the game's 65816 code is statically recompiled to C and compiled for your machine.
+Linux first, Steam Deck and ROG Ally tuned, Windows and Android on the way.
 
-> **Not affiliated.** This project is not affiliated with, authorized by or endorsed by the
-> rights holders of Chrono Trigger. Game and company names are trademarks of their respective
-> owners and are used here only to say what the software works with. It contains no game
-> code, data, art or music.
+[![ci](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml/badge.svg)](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml)
+[![port](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml/badge.svg)](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml)
+[![release](https://img.shields.io/github/v/release/Dittobyte/Triggered-Chrono-RecompHD2D?include_prereleases&label=latest)](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/releases)
 
-You need your own copy of the game. Put your headerless 4 MB dump in `rom/` and point
-`CT_ROM` at it (see Build below). That folder is git-ignored, and no game data (ROMs,
-extracted assets, keys) is ever committed to this repository.
+> **Not affiliated.** This project is not affiliated with, authorized by or endorsed by the rights holders of
+> Chrono Trigger. Game and company names are trademarks of their respective owners and are used only to say what
+> the software works with.
+>
+> **Bring your own game.** It contains no game code, data, art or music. You supply your own legally obtained,
+> headerless 4 MB US 1.0 dump; the game module is built on your machine from it, once. No ROM, save, extracted
+> asset or generated game code is ever committed or released here, and we will not link to places to get one.
 
-**Players:** the [player's guide](docs/USER-GUIDE.md) covers installing the AppImage or
-Flatpak, the first launch, controls, where files live and troubleshooting. On a Steam Deck or
-ROG Ally, follow [docs/HANDHELD.md](docs/HANDHELD.md): Game Mode, controller-only setup,
-the controls and the Deck preset. To replace the game's art with your own, or with
-upscaled placeholders made from your ROM, or its music with recordings of your own, see
-[docs/ASSET-PACKS.md](docs/ASSET-PACKS.md); to draw the text boxes with a font of your
-choice, [HD text](docs/USER-GUIDE.md#hd-text). No art, music or font comes with it.
+## The goal
 
-CI for the port (`.github/workflows/port.yml`) runs without a ROM: an engine-only build
-and its tests, a check for generated code in the engine programs, the game-agnostic and
-REUSE lints, and `tools/check_dist.py` on the installed engine before it is uploaded.
+A true HD-2D Chrono Trigger: the original game running as native code, drawn like the modern HD-2D remakes,
+a miniature stage, warm light, soft depth of field, crisp pixel art, built entirely from what is already in the
+player's own ROM. No new art is required for the default look. We want it fast on handhelds, comfortable on a
+controller, and open enough that anyone can help finish it.
+
+## Where it stands (alpha, be honest with us)
+
+| | |
+|---|---|
+| Plays | The original game from the intro through the replays we test: Leene Square, the first battle, the world map, the field menu. Whole-game coverage is **not proven yet** (that is the next big milestone, see below). |
+| Looks | The original picture by default. HD-2D (flat or 3D diorama) is one switch away: menu, Look tab, or `--hd2d`. Presets from light to full, tuned for the Steam Deck and ROG Ally. |
+| Recompiled | 1990 of 2263 known functions are native C; 98% of a boot's instructions run native. The built-in interpreter covers the rest, so the game is complete either way. A further round of compiler work measures above 99% and is next. |
+| Comfort | Quick menu on F1, rewind, slow motion, frame step, save backups, corner overlays (FPS, clock, battery, play time), A/B and X/Y swap, touch controls. |
+| Not yet | Windows, Android and Flatpak builds are not published. Controller work for the 2026 Steam Controller is planned. Expect rough edges. |
+
+Download the latest pre-release from [Releases](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/releases)
+(AppImage for Linux x86_64, plus the engine tarball and checksums). Then follow the [player's guide](docs/USER-GUIDE.md).
+On a Steam Deck or ROG Ally use [docs/HANDHELD.md](docs/HANDHELD.md).
+
+## How it works
+
+1. **Static recompilation.** `recomp/` reads your ROM, decodes every known function with static tracking of the 65816's
+   variable register widths, and emits C. `runtime/` supplies the CPU model, bus, cycle model, frame scheduler and the
+   SNES hardware (PPU, DMA, audio cores). The build runs on your machine, about 40 seconds, once.
+2. **An interpreter as the safety net and the referee.** Code that lives in RAM or patches itself, and anything the
+   decoder cannot prove, runs in a small interpreter. The same interpreter is the oracle: tests run native and
+   interpreted side by side and require identical state hashes on every frame of every replay.
+3. **An HD-2D renderer** (`frontend/hd2d/`). The game keeps a layered scene; we classify its layers and sprites,
+   rebuild a stage with depth, and apply tilt-shift blur, bloom, soft shadows and a filmic grade. Optional 3D diorama
+   looks add camera tilt and, on the Deck-class presets, a lighter cost.
+4. **Engine and game stay separate.** `recomp/`, `runtime/` and `frontend/` do not know the game; everything about
+   Chrono Trigger lives in `game/ct/` as data and hooks. Another SNES game could, in principle, reuse the engine.
+
+## Our research (read it, challenge it, extend it)
+
+We write down what we learn, with sources and with what we have not verified. Start here:
+
+| Topic | Document |
+|---|---|
+| How similar projects turn old games into HD, 3D and co-op; lessons from other recompilations | [docs/PRIOR-ART.md](docs/PRIOR-ART.md), [docs/COOP-PRIOR-ART.md](docs/COOP-PRIOR-ART.md) |
+| What "right" looks like for the HD-2D and diorama looks, and the QA rules | [docs/VISUAL-DESIGN.md](docs/VISUAL-DESIGN.md), [docs/QA-2D.md](docs/QA-2D.md), [docs/QA-3D.md](docs/QA-3D.md), [docs/QA-WORLD.md](docs/QA-WORLD.md), [docs/QA-AUDIT.md](docs/QA-AUDIT.md) |
+| The renderer: planes, depth, blur, bloom, presets, debug views | [docs/HD2D.md](docs/HD2D.md) |
+| What the game keeps in memory that a renderer can use to rebuild a scene (OAM, layers, heights) | [docs/SCENE.md](docs/SCENE.md) |
+| R1: geometry hints and the 3D-scene correctness items (where the diorama is wrong, and how to fix it) | [docs/research/GEOMETRY.md](docs/research/GEOMETRY.md) |
+| R2: how the commercial HD-2D games build the look, mapped to our renderer | [docs/research/LOOK.md](docs/research/LOOK.md) |
+| R3: asset packs: upscalers, material maps, loaders, what other emulators really support | [docs/research/ASSETS.md](docs/research/ASSETS.md) |
+| R4: native controller support for Nintendo, Xbox, PlayStation, the 2026 Steam Controller and the Deck, checked against SDL source | [docs/research/INPUT.md](docs/research/INPUT.md) |
+| Engine and game module split; code in RAM (overlays); patches | [docs/MODULES.md](docs/MODULES.md) |
+| Why the code is GPL-only | [docs/GPL-REWRITE.md](docs/GPL-REWRITE.md) |
+| Open problems we know about | [docs/KNOWN-ISSUES.md](docs/KNOWN-ISSUES.md) |
+| Where it is going | [ROADMAP.md](ROADMAP.md) |
+
+## What we are working on next
+
+- **Finish the recompile and make the interpreter unnecessary in play.** Merge the next compiler round (above 99% native on
+  our replays), record the whole game in chapters, list every function no recording reaches, add a trap build that reports
+  each entry into the interpreter, and close that list. The interpreter stays as the test referee and last-resort fallback.
+- **HD-2D correctness.** The scene classification and 3D geometry items in R1: where the stage is built wrong, UI that must
+  stay flat, a level solver for heights.
+- **Controllers, natively.** Bundle a newer SDL so the 2026 Steam Controller works without Steam; player LEDs, GameCube and
+  third-party pad glyphs, gyro and touchpad pointers, per-player button pictures.
+- **Quick menu tiles** for the new rewind, speed and overlay features, then achievements (RetroAchievements), widescreen and
+  more from the [roadmap](ROADMAP.md).
+
+## Help us build it
+
+You do not need to write C to help. Pick a lane:
+
+- **Play and report.** The most useful thing right now. Tell us your GPU, distro, the look you used, and your controller.
+  Open an [issue](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/issues). Never attach a ROM, a save or a
+  screenshot you did not take yourself.
+- **Test hardware.** Steam Deck, ROG Ally, Legion Go, DualSense, Switch Pro, Xbox and the 2026 Steam Controller. The
+  checklists are in [docs/HANDHELD.md](docs/HANDHELD.md); we mark what we could not verify as unverified, so anything you
+  confirm or break is valuable.
+- **Record the game.** Whole-game coverage needs recordings of full playthroughs, kept on your own machine (they stay
+  out of the repo). `ct_sdl --record` already saves your input as a script; chapter tooling is landing next.
+- **Read the research and push back.** Find a hole in R1 to R4, a better way to do depth of field, a source we missed.
+  Open an issue or send a patch to the doc.
+- **Make art for packs, with your own work.** Replacement art, fonts and music load from packs
+  ([docs/ASSET-PACKS.md](docs/ASSET-PACKS.md)). Only art you made or have the right to share.
+- **Write code.** Good places to start: the HD-2D renderer and its debug views (`frontend/hd2d/`), the recompiler's decoder
+  and emitter (`recomp/`), tests (`test/`), tools (`tools/`), docs. Read [docs/MODULES.md](docs/MODULES.md) first.
+
+**Ground rules for every contribution**
+1. No game data in a pull request: no ROM bytes, extracted art or music, saves, states, recordings, dumps or generated C.
+   `tools/check_dist.py` and the CI check enforce this.
+2. Licence: GPL-3.0-or-later. New files carry an SPDX header; third-party code only if its licence is compatible, with its
+   notice kept and listed in `THIRD_PARTY.md`.
+3. The engine stays game-agnostic: `python3 tools/check_agnostic.py .` must be clean.
+4. Tests stay honest: never weaken, skip or loosen one to get a green run. A failing test is information.
+5. Original names and our own words. No promotion of this project as a way to play without owning the game.
+
+## Build and run from source
+
+Requirements: CMake 3.20+, a C11 compiler, Python 3.11+, SDL2 for the window.
+
+```
+export CT_ROM=/path/to/chrono_trigger.sfc    # your own headerless 4 MB US 1.0 dump; git-ignored
+cmake -S . -B build && cmake --build build -j && ctest --test-dir build
+build/ct_sdl                                 # play (add --hd2d for the HD-2D look)
+```
+
+Engine only, no ROM (what CI runs): `cmake -S . -B build && cmake --build build -j && ctest --test-dir build -LE rom`.
+More on the programs, tools and layout is in the developer reference at the end of this file.
+
+## Credits
+
+Built on [ct-recomp](https://github.com/ThisIsAkill/ct-recomp) by Akhil Moola (MIT). Includes the zelda3 SNES core (MIT)
+and the ares SPC700 core (ISC). Symbol names are partly derived from dscotton/ct_disassembly (public domain) and
+ChronoRET (MIT); [Mesen 2](https://github.com/SourMesen/Mesen2) is used as a reference tool. Thanks to the TASVideos
+community for the input movies we compare against, and to everyone who documented the SNES and this game.
+The file-by-file licence map is in [REUSE.toml](REUSE.toml), the texts in [LICENSES/](LICENSES/), the details in
+[THIRD_PARTY.md](THIRD_PARTY.md).
 
 ## License
 
-This project is licensed under the GNU General Public License, version 3 or (at your
-option) any later version: see [LICENSE](LICENSE).
-
-It includes code under other, GPL-compatible licenses, which keeps its original notices:
-ct-recomp (MIT), the zelda3 SNES core (MIT) and the ares SPC700 core (ISC). The file-by-file
-map is in [REUSE.toml](REUSE.toml), the license texts are in [LICENSES/](LICENSES/), and the
-details are in [THIRD_PARTY.md](THIRD_PARTY.md).
+GNU General Public License, version 3 or (at your option) any later version: see [LICENSE](LICENSE). It includes code under
+other, GPL-compatible licences which keep their original notices (see Credits).
 
 ---
 
-*The rest of this README comes from upstream ct-recomp.*
+## Developer reference
 
-## ct-recomp
+The notes below are the engine's own documentation: layout, build options, replays, reference comparison. The recompiler
+and runtime are game-agnostic; everything specific to Chrono Trigger lives in `game/ct/`.
 
-[![ci](https://github.com/ThisIsAkill/ct-recomp/actions/workflows/ci.yml/badge.svg)](https://github.com/ThisIsAkill/ct-recomp/actions/workflows/ci.yml)
 
 Static recompiler for Chrono Trigger (SNES, US 1.0) 65816 code to C, plus a C runtime.
 The recompiler and runtime are game-agnostic; everything specific to Chrono
@@ -52,7 +152,7 @@ Trigger lives in `game/ct/`.
 Planned features after boot (MSU-1, achievements, save states, widescreen and
 more) are listed in [ROADMAP.md](ROADMAP.md).
 
-## Progress
+## Progress numbers
 
 <!-- progress:start -->
 
@@ -154,18 +254,4 @@ The ROM is never committed, and CI never sees it.
 
 Symbol names partly derived from dscotton/ct_disassembly (public domain) and ChronoRET.
 
-## ROM and credits
-
-The project's license is GPL-3.0-or-later; see [License](#license) above. The Chrono Trigger ROM and its
-assets are **not included** and remain the property of their copyright
-holders — you must supply your own legally obtained ROM via `$CT_ROM`.
-Symbol names are credited to dscotton/ct_disassembly (public domain) and
-ChronoRET. See `THIRD_PARTY.md` for vendored/adapted third-party code.
-
-## Credits
-
-Triggered Chrono is built on **[ct-recomp](https://github.com/ThisIsAkill/ct-recomp)** by
-**Akhil Moola** (MIT licence, copyright 2026 Akhil Moola). The recompiler, runtime and much of the
-frontend and test suite come from that project, and its full commit history (165 commits) is kept in this
-repository. Thank you, Akhil, for the foundation this work stands on. The upstream licence text is in
-`LICENSES/MIT.txt` and the details of what came from where are in `THIRD_PARTY.md` and `CREDITS.md`.
+The ROM is never committed, and CI never sees it.
