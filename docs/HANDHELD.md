@@ -404,6 +404,11 @@ KERNEL=="hidraw*", KERNELS=="0005:0000057E:*", TAG+="uaccess"
 KERNEL=="hidraw*", KERNELS=="0005:0000045E:*", TAG+="uaccess"
 ```
 
+**Caution:** these lines match every USB or Bluetooth device of the four makers, not just game pads
+(a Microsoft keyboard or a Sony headset also has a hidraw node). If you want less access, add
+`ATTRS{idProduct}=="xxxx"` for your own pad's product ID (the game prints it at startup, for
+example `28de:1304`), one line per pad.
+
 then `sudo udevadm control --reload-rules && sudo udevadm trigger` and unplug and replug the
 pad (a Bluetooth pad: disconnect and connect again). The `70-` prefix is the usual place
 for "uaccess" rules, which must run before `73-seat-late.rules`. The Bluetooth lines are
