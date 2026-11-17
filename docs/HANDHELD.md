@@ -369,10 +369,71 @@ The template's back-button names (`button_back_left_upper` = L4, `button_back_le
 follow layouts exported from real Decks; the file itself has not been loaded by Steam yet.
 If Steam doesn't list it, bind the four buttons by hand.
 
+### Controller access on Linux (udev rules, `/dev/hidraw*`)
+
+SDL reads most pads through its own "HIDAPI" drivers, and on Linux those open the pad's
+`/dev/hidrawN` node. Without read and write access to it SDL falls back to the kernel's
+plain joystick interface: the buttons and sticks still work, but the extras that need the
+raw channel may not. What each family uses it for in this game (from SDL's driver sources
+and the game's own code; nothing here was tried on real hardware, so treat the "may not"
+parts as **unverified**):
+
+| Family | Needs hidraw for | Without it |
+|---|---|---|
+| Steam Deck, Steam Controller (28de) | everything past the plain sticks and buttons: back buttons, trackpads, gyro, rumble | the Deck's back buttons and gyro do not reach the game (unverified for each pad) |
+| PlayStation (054c) | gyro, light bar and player lights (`pad_leds`), touchpad, rumble | buttons and sticks only (unverified) |
+| Nintendo Switch Pro, Joy-Con (057e) | gyro, rumble, player lights, a left and right Joy-Con joined as one pad | buttons and sticks only (unverified) |
+| Xbox (045e) | rumble on some connections | buttons and sticks (unverified) |
+| GameCube adapter (057e:0337) | reading the pads at all (SDL's driver talks to the adapter directly) | no pad (unverified) |
+
+Most desktop distributions already give the logged-in user access to a game pad through
+"uaccess" rules. If yours does not, a minimal rule file written from udev's documented
+fields: `/etc/udev/rules.d/70-ct-recomp-pads.rules`
+
+```
+# USB: the hidraw node's parent has the vendor ID
+KERNEL=="hidraw*", ATTRS{idVendor}=="28de", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="054c", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="057e", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="045e", TAG+="uaccess"
+# Bluetooth: the parent HID device is named bus:vendor:product (0005 = Bluetooth)
+KERNEL=="hidraw*", KERNELS=="0005:000028DE:*", TAG+="uaccess"
+KERNEL=="hidraw*", KERNELS=="0005:0000054C:*", TAG+="uaccess"
+KERNEL=="hidraw*", KERNELS=="0005:0000057E:*", TAG+="uaccess"
+KERNEL=="hidraw*", KERNELS=="0005:0000045E:*", TAG+="uaccess"
+```
+
+then `sudo udevadm control --reload-rules && sudo udevadm trigger` and unplug and replug the
+pad (a Bluetooth pad: disconnect and connect again). The `70-` prefix is the usual place
+for "uaccess" rules, which must run before `73-seat-late.rules`. The Bluetooth lines are
+**unverified**: the device name format is from the kernel's HID documentation and SDL's own
+sources, and was not checked on a pad.
+
+- **Steam's rules.** Steam installs its own rules for Valve's pads and many others; on
+  most distributions they come from a package called `steam-devices` (or are part of the
+  `steam` package), and on SteamOS and Bazzite they are already there. The file's exact
+  name and folder differ between distributions (**unverified**: look in
+  `/usr/lib/udev/rules.d/` and `/etc/udev/rules.d/` for a file with `steam` in its name).
+  This game does not ship or copy that file.
+- **Flatpak.** A Flatpak app sees only the devices it asks for. If the pad's extras are
+  missing in a Flatpak build, run it with `flatpak run --device=all <app>` (or
+  `flatpak override --user --device=all <app>`). A narrower permission may exist in newer
+  Flatpak versions (**unverified**). Under Steam Input none of this is needed: Steam reads
+  the pad and hands the game a plain virtual one.
+- **Lights.** With access, a PlayStation, Switch or Xbox 360 pad shows its player number,
+  and a pad with a light bar takes a colour per player (1 blue, 2 red, 3 green).
+  `pad_leds=off` in `settings.ini` (or Controls > Controller lights in the menu) turns
+  this off. Which pads really change colour is **unverified** on hardware.
+- To see what SDL found, start the game from a terminal: it prints each controller with
+  its vendor:product and glyph set at startup.
+
 ### Button glyphs
 
 Messages on screen show the buttons of the device you used last: the Deck's, a Steam
-Controller's, Xbox, PlayStation or Switch buttons, or keyboard keys after a key press. The
+Controller's, Xbox, PlayStation or Switch buttons, the GameCube adapter's (written
+as text: A, X, B, Y, Z, L, R), or keyboard keys after a key press. A Switch Pro pad
+from another maker is shown with the Switch buttons too (SDL's type, or the name
+"Pro Controller"). The
 pad is recognized from SDL's controller type and its USB vendor and product. Steam Input's
 virtual pad shows the Deck's buttons on a Deck and Xbox buttons elsewhere, unless Steam
 tells SDL the real pad's type. The pictures are Kenney's Input Prompts (CC0,
