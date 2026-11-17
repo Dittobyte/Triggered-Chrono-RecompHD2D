@@ -85,8 +85,10 @@ def update_readme(recompiled: int, known: int, native: float | None,
     if README_START not in text or README_END not in text:
         return
     lines = [README_START, '',
-             f'**{100 * recompiled / known:.1f}% recompiled**: {recompiled} of {known} known '
-             f'functions are compiled to C.', '']
+             f'**{100 * recompiled / known:.1f}% of the functions found so far are compiled**: '
+             f'{recompiled} of {known} known functions are compiled to C. "Known" means found by '
+             'the recompiler and the replays; whole-game coverage is a separate, unmeasured claim '
+             '(see the progress picture above).', '']
     if native is not None:
         lines += [f'- Native at runtime: {native:.1f}% of the instructions in a 1500-frame '
                   'boot run as compiled C (the rest run in the interpreter).']
