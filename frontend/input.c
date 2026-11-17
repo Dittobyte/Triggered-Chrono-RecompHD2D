@@ -251,6 +251,18 @@ void input_sdl_hints(int native_steam)
     input_pad_leds_hints();
 }
 
+/* port: a pad's player number and, where it has a light, its colour
+   (input.h). Nothing at all with pad_leds=off. */
+void input_pad_extras_apply(SDL_GameController *pad, int player)
+{
+    static const Uint8 colour[3][3] = {{0, 64, 255}, {255, 32, 32}, {32, 200, 64}};   /* P1 blue, P2 red, P3 green */
+    if (!pad || !pad_leds_on || player < 0 || player > 2)
+        return;
+    SDL_GameControllerSetPlayerIndex(pad, player);
+    if (SDL_GameControllerHasLED(pad))
+        SDL_GameControllerSetLED(pad, colour[player][0], colour[player][1], colour[player][2]);
+}
+
 int input_under_steam_input(const char **why)
 {
     static const char *const vars[] = {"SteamVirtualGamepadInfo",

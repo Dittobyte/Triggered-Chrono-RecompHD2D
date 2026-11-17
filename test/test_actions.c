@@ -23,6 +23,7 @@
 #include "input.h"
 #include "osd_text.h"
 #include "png.h"
+#include "settings.h"
 
 static long checks, fails;
 #define CHECK(c, ...)                                                    \
@@ -542,6 +543,59 @@ static void test_swap_deadzone(void)
     detach(&v);
 }
 
+/* Player index and light colour (input_pad_extras_apply) on a virtual pad
+   that records what SDL passes to its driver. */
+static struct { int index; int led_calls; Uint8 rgb[3]; } rec_pad;
+static void SDLCALL rec_index(void *u, int i) { (void)u; rec_pad.index = i; }
+static int SDLCALL rec_led(void *u, Uint8 r, Uint8 g, Uint8 b)
+{
+    (void)u;
+    rec_pad.led_calls++;
+    rec_pad.rgb[0] = r, rec_pad.rgb[1] = g, rec_pad.rgb[2] = b;
+    return 0;
+}
+
+static void test_pad_extras(void)
+{
+    SDL_VirtualJoystickDesc d;
+    memset(&d, 0, sizeof d);
+    d.version = SDL_VIRTUAL_JOYSTICK_DESC_VERSION;
+    d.type = SDL_JOYSTICK_TYPE_GAMECONTROLLER;
+    d.naxes = SDL_CONTROLLER_AXIS_MAX;
+    d.nbuttons = SDL_CONTROLLER_BUTTON_MAX;
+    d.vendor_id = 0x054c;
+    d.product_id = 0x0ce6;
+    d.name = "DualSense";
+    d.SetPlayerIndex = rec_index;
+    d.SetLED = rec_led;
+    int idx = SDL_JoystickAttachVirtualEx(&d);
+    CHECK(idx >= 0, "attach lit pad: %s", SDL_GetError());
+    SDL_GameController *pad = idx >= 0 ? SDL_GameControllerOpen(idx) : NULL;
+    CHECK(pad != NULL, "open lit pad");
+    if (!pad)
+        return;
+    CHECK(SDL_GameControllerHasLED(pad), "the virtual pad has a light");
+    input_register_settings();
+    rec_pad.index = -9;
+    input_pad_extras_apply(pad, 1);
+    CHECK(rec_pad.index == 1 && rec_pad.led_calls == 1 && rec_pad.rgb[0] == 255 &&
+              rec_pad.rgb[2] < 64,
+          "player 2: index %d, light %d,%d,%d (red)", rec_pad.index, rec_pad.rgb[0], rec_pad.rgb[1],
+          rec_pad.rgb[2]);
+    input_pad_extras_apply(pad, 0);
+    CHECK(rec_pad.index == 0 && rec_pad.rgb[2] == 255 && rec_pad.rgb[0] < 64, "player 1: blue");
+    CHECK(settings_parse_line("pad_leds=off\n") == 1 && !input_pad_leds(), "pad_leds=off read");
+    rec_pad.index = -9;
+    rec_pad.led_calls = 0;
+    input_pad_extras_apply(pad, 2);
+    CHECK(rec_pad.index == -9 && rec_pad.led_calls == 0, "pad_leds=off: nothing sent");
+    settings_parse_line("pad_leds=auto\n");
+    CHECK(input_pad_leds() == 1, "pad_leds=auto back on");
+    input_pad_extras_apply(NULL, 0);   /* no pad: no crash */
+    SDL_GameControllerClose(pad);
+    SDL_JoystickDetachVirtual(idx);
+}
+
 int main(int argc, char **argv)
 {
     if (SDL_Init(SDL_INIT_GAMECONTROLLER)) {
@@ -559,6 +613,7 @@ int main(int argc, char **argv)
     test_stubs();
     test_gyro();
     test_swap_deadzone();
+    test_pad_extras();
     SDL_Quit();
     printf("test_actions: %ld checks, %ld failures\n", checks, fails);
     return fails ? 1 : 0;
