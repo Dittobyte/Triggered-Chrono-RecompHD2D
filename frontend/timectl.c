@@ -24,6 +24,7 @@ static tcr *ring;
 static long last_cap = -1000, last_seen = -1000;
 static int rewinding, rew_first, rew_ticks, rew_end, rew_loaded;
 static int step_pending, step_running;
+static int rew_hold;   /* rewind ticks left in a timed rewind (timectl_rewind_for) */
 
 /* ---- pure helpers ---- */
 
@@ -182,6 +183,7 @@ void timectl_rewind(int down)
         if (!rewinding)
             return;
         rewinding = 0;
+        rew_hold = 0;
         if (rew_loaded && ring) {   /* play on from the state it stopped at */
             last_seen = last_cap = sched_frame_count();
         }
@@ -214,10 +216,25 @@ void timectl_rewind(int down)
         host.audio_restart();
 }
 
+/* The quick menu's Rewind: hold the rewind for about `frames` frames of
+   game time (a state back is 4 frames per 2 ticks), then let go. */
+void timectl_rewind_for(int frames)
+{
+    if (rewinding)
+        return;   /* already held by the action */
+    timectl_rewind(1);
+    if (rewinding)
+        rew_hold = (frames > 0 ? frames : 1) / 2 + 2;
+}
+
 void timectl_rewind_tick(void)
 {
     if (!rewinding || !ring)
         return;
+    if (rew_hold && --rew_hold == 0) {
+        timectl_rewind(0);
+        return;
+    }
     if (rew_first) {   /* the newest state is the one we are at (or just before) */
         rew_first = 0;
         load_newest();

@@ -18,6 +18,7 @@ extern "C" {
 #include "glyphs.h"
 #include "menu.h"
 #include "settings.h"
+#include "timectl.h"
 }
 
 #include "ui_backend.h"
@@ -119,6 +120,56 @@ const char *text_look(char *buf, size_t n)
     return p ? settings_value_text(p, buf, n) : "";
 }
 
+/* ---- tiles with no row of their own ---- */
+
+void run_framestep(void) { actions_emit(ACTION_FRAMESTEP, 1); }
+int rewind_enabled(void)
+{
+    const setting *s = settings_find("rewind_seconds");
+    return s && settings_get_value(s) > 0;
+}
+void run_rewind(void) { timectl_rewind_for(60); }   /* about a second of game time */
+
+/* Restore: step over the dated backups ("Restore backup 1..6", saves.c),
+   then press Restore twice. */
+constexpr int SAVES_PICK = 6;
+int restore_sel = 0;
+const setting *restore_row(int k)
+{
+    char lab[40];
+    snprintf(lab, sizeof lab, "Restore backup %d", k + 1);
+    for (int i = 0; i < settings_count(); i++) {
+        const setting *s = settings_at(i);
+        if (s->category && s->label && !strcmp(s->category, "Save states") && !strcmp(s->label, lab))
+            return s;
+    }
+    return NULL;
+}
+int restore_enabled(void)
+{
+    const setting *r = restore_row(restore_sel);
+    return r && settings_is_enabled(r);
+}
+int get_restore_sel(void) { return restore_sel; }
+void set_restore_sel(int v)
+{
+    const setting *r = restore_row(v);
+    restore_sel = r && settings_is_enabled(r) ? v : 0;   /* past the last backup: round to the newest */
+}
+const char *text_restore_sel(char *buf, size_t n)
+{
+    const setting *r = restore_row(restore_sel);
+    if (!r || !r->text)
+        return "-";
+    return r->text(r->user, buf, n);
+}
+void run_restore(void)
+{
+    const setting *r = restore_row(restore_sel);
+    if (r && r->run)
+        r->run(r->user);
+}
+
 void run_all_settings(void)
 {
     qm_close_now();
@@ -140,27 +191,40 @@ Tile TILES[] = {
     {S_GAME, "Load slot", K_BUTTON, 0, 0, 0, run_load_slot, 0, 0, 0, 0, 0, 0, text_slot, TF_CLOSE,
      0},
     {S_GAME, "Volume", K_AUTO, "volume", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, TF_WIDE, 0},
+    {S_GAME, "Reset", K_AUTO, 0, "Save states", "Reset the game", 0, 0, 0, 0, 0, 0, 0, 0,
+     TF_CONFIRM | TF_CLOSE, 0},
+    /* ---- Time (timectl.c rows; Rewind and Frame step are buttons) ---- */
+    {S_TIME, "Game speed", K_AUTO, "slow_speed", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_TIME, "Rewind length", K_AUTO, "rewind_seconds", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_TIME, "Frame step", K_BUTTON, 0, 0, 0, run_framestep, 0, 0, 0, 0, 0, 0, 0, TF_CLOSE, 0},
+    {S_TIME, "Rewind", K_BUTTON, 0, 0, 0, run_rewind, rewind_enabled, 0, 0, 0, 0, 0, 0, TF_CLOSE,
+     0},
     /* ---- Look ---- */
     {S_LOOK, "Look", K_BUTTON, 0, 0, 0, run_look, look_enabled, 0, 0, 0, 0, 0, text_look, 0, 0},
     {S_LOOK, "Aspect", K_AUTO, "aspect", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {S_LOOK, "Integer scale", K_AUTO, 0, "Display", "Integer scale", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {S_LOOK, "CRT look", K_AUTO, 0, "Display", "CRT look", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {S_LOOK, "Fullscreen", K_AUTO, "fullscreen", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-
-    /* ==== LATER PASS: tiles for the features of lanes Q2 and Q3 plug in
-       here (the lead adds them against timectl.h, overlays.h, saves.h and
-       the input setters). One line each; the section places them. Planned
-       (docs plan, "Design" table):
-         S_GAME     Reset (TF_CONFIRM, game_reset_request)
-         S_TIME     Rewind (hold), Speed stepper 0.25/0.5/1/2/3/4x (K_STEP,
-                    timectl_speed_*), Frame step
-         S_OVERLAYS FPS, Clock, Battery, Play time (K_AUTO, the
-                    overlay_* rows)
-         S_CONTROLS Swap A/B, Swap X/Y, Deadzone slider (K_AUTO rows),
-                    Touch size / opacity / hand, Cheat-sheet
-         S_SAVES    Back up now, Restore (saves_backup_*)
-       ==== end of the table for later ==== */
-
+    /* ---- Overlays (overlays.c rows) ---- */
+    {S_OVERLAYS, "FPS", K_AUTO, "overlay_fps", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_OVERLAYS, "Clock", K_AUTO, "overlay_clock", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_OVERLAYS, "Battery", K_AUTO, "overlay_battery", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_OVERLAYS, "Play time", K_AUTO, "overlay_playtime", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_OVERLAYS, "Corner", K_AUTO, "overlay_corner", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    /* ---- Controls (input.c and touch.c rows) ---- */
+    {S_CONTROLS, "Swap A/B", K_AUTO, "swap_ab", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_CONTROLS, "Swap X/Y", K_AUTO, "swap_xy", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_CONTROLS, "Dead zone", K_AUTO, "stick_deadzone", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, TF_WIDE, 0},
+    {S_CONTROLS, "Touch size", K_AUTO, "touch_size", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_CONTROLS, "Touch opacity", K_AUTO, "touch_opacity", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {S_CONTROLS, "Touch hand", K_AUTO, "touch_hand", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    /* ---- Saves (saves.c rows; Restore picks a dated backup, then asks twice) ---- */
+    {S_SAVES, "Back up now", K_AUTO, 0, "Save states", "Back up now", 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0},
+    {S_SAVES, "Backup", K_STEP, 0, 0, 0, 0, restore_enabled, get_restore_sel, set_restore_sel, 0,
+     SAVES_PICK - 1, 1, text_restore_sel, 0, 0},
+    {S_SAVES, "Restore", K_BUTTON, 0, 0, 0, run_restore, restore_enabled, 0, 0, 0, 0, 0, 0,
+     TF_CONFIRM, 0},
     /* ---- More ---- */
     {S_MORE, "All settings...", K_BUTTON, 0, 0, 0, run_all_settings, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 };
@@ -271,6 +335,7 @@ struct QM {
     Tile *vis[N_TILES];
     int nvis;
     int focus;
+    float goal_x;     /* the column an up / down walk keeps (content x), -1: the focus' own */
     int confirm;      /* index in vis of a tile waiting for its second press, -1 */
     Dir pad, stick, keys;
     int cur_x, cur_y;
@@ -489,6 +554,7 @@ void focus_to(int i)
     if (Q.focus != i)
         Q.confirm = -1;
     Q.focus = i;
+    Q.goal_x = -1;
     Q.ensure = true;
 }
 
@@ -498,6 +564,9 @@ bool move_focus(int dx, int dy)
         return false;
     const Rect &f = Q.L.r[Q.focus];
     float fcx = f.x + f.w * 0.5f, fcy = f.y + f.h * 0.5f;
+    /* up / down keep the column they started in across short rows and
+       wide tiles, so a tile behind a stepper is still reachable */
+    float gx = Q.goal_x >= 0 ? Q.goal_x : fcx;
     int best = -1;
     float bd = 1e18f;
     for (int i = 0; i < Q.nvis; i++) {
@@ -514,7 +583,7 @@ bool move_focus(int dx, int dy)
         } else {
             if (ddy * dy <= f.h * 0.5f)
                 continue;
-            d = fabsf(ddy) * 1000.0f + fabsf(ddx);   /* the nearest row, then the nearest column */
+            d = fabsf(ddy) * 1000.0f + fabsf(cx - gx);   /* the nearest row, then the nearest column */
         }
         if (d < bd)
             bd = d, best = i;
@@ -522,6 +591,8 @@ bool move_focus(int dx, int dy)
     if (best < 0)
         return false;
     focus_to(best);
+    if (dy)
+        Q.goal_x = gx;
     return true;
 }
 
@@ -732,6 +803,8 @@ void quickmenu_open(void)
     Q.toast_ms = 0;
     Q.p = {};
     Q.focus = Q.nvis ? 0 : -1;
+    Q.goal_x = -1;
+    restore_sel = 0;   /* Restore starts at the newest backup */
     Q.ensure = true;
     relayout();
 }
