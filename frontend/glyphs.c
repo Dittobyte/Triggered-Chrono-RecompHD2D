@@ -95,6 +95,17 @@ static const glyph_def pads[GLYPHS_SETS - 1][T_COUNT] = {
         {"steam_rg", "R grip"}, {"steam_lg", "L grip"}, {NULL, "P3"}, {NULL, "P4"},
         {NULL, "Misc"}, {NULL, "Pad"},
     },
+    /* The GameCube adapter, by position (SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS=0:
+       SDL_hidapi_gamecube.c, release-2.32.10, swaps its B and X then): south is the
+       pad's A, east its X, west its B, north its Y; its Z is SDL's right shoulder,
+       its L and R are the triggers, and it has no Back, Guide or left shoulder button.
+       No pictures: text only. */
+    [GLYPHS_GAMECUBE - 1] = {
+        {NULL, "A"}, {NULL, "X"}, {NULL, "B"}, {NULL, "Y"}, {NULL, "Back"}, {NULL, "Start"},
+        {NULL, "Guide"}, {NULL, "L1"}, {NULL, "Z"}, {NULL, "L"}, {NULL, "R"}, {NULL, "L3"},
+        {NULL, "R3"}, {NULL, "D-pad"}, {NULL, "P1"}, {NULL, "P2"}, {NULL, "P3"}, {NULL, "P4"},
+        {NULL, "Misc"}, {NULL, "Touchpad"},
+    },
 };
 
 /* With the keyboard in use: the key doing what a controller button does
@@ -107,10 +118,15 @@ static const char *const keyboard_for[T_COUNT] = {
 
 static const char *const family_names[GLYPHS_SETS] = {
     "keyboard", "Xbox", "PlayStation", "Nintendo Switch", "Steam Deck", "Steam Controller",
+    "GameCube",
 };
 
 int glyphs_family(int type, uint16_t vendor, uint16_t product, const char *name, int on_deck)
 {
+    /* Nintendo's GameCube adapter (USB_PRODUCT_NINTENDO_GAMECUBE_ADAPTER 0x0337,
+       SDL src/joystick/usb_ids.h, release-2.30.0 and 2.32.10): before the Switch fallback */
+    if (vendor == 0x057e && product == 0x0337)
+        return GLYPHS_GAMECUBE;
     if (vendor == 0x28de) {   /* Valve; product IDs from SDL's controller_list.h */
         switch (product) {
         case 0x1205:   /* the Steam Deck's built-in controller */
@@ -154,6 +170,9 @@ int glyphs_family(int type, uint16_t vendor, uint16_t product, const char *name,
         return GLYPHS_STEAM_CONTROLLER;
     if (type == SDL_CONTROLLER_TYPE_XBOX360 || type == SDL_CONTROLLER_TYPE_XBOXONE)
         return GLYPHS_XBOX;
+    /* A third-party Switch Pro pad: another vendor ID, the Pro's generic name */
+    if (name && strstr(name, "Pro Controller"))
+        return GLYPHS_SWITCH;
     if (vendor == 0x054c)   /* Sony */
         return GLYPHS_PLAYSTATION;
     if (vendor == 0x057e)   /* Nintendo */

@@ -31,6 +31,7 @@ enum {
     GLYPHS_SWITCH,
     GLYPHS_STEAM_DECK,
     GLYPHS_STEAM_CONTROLLER,
+    GLYPHS_GAMECUBE,   /* Nintendo's GameCube adapter: text labels only */
     GLYPHS_SETS
 };
 
@@ -41,7 +42,10 @@ enum {
    (SDL_GameControllerType), USB vendor / product and name. A Steam
    Input virtual pad (Valve 28de:11ff, which reports the real pad's type
    when Steam tells SDL) is the Deck's built-in controller when on_deck;
-   otherwise an Xbox-style pad unless its type says else. */
+   otherwise an Xbox-style pad unless its type says else. The GameCube
+   adapter (057e:0337) has its own family; a Switch Pro pad is known by
+   SDL's type or its "Pro Controller" name as well as by Nintendo's
+   vendor ID, since third-party ones report other IDs. */
 int glyphs_family(int type, uint16_t vendor, uint16_t product, const char *name, int on_deck);
 int glyphs_family_of(SDL_GameController *pad);   /* the same, from an open pad */
 const char *glyphs_family_name(int set);         /* "Steam Deck", "Xbox", ... */

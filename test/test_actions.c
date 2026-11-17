@@ -290,6 +290,8 @@ static void test_families(void)
         {0x045e, 0x0b12, "Xbox Series X Controller", GLYPHS_XBOX, 0},
         {0x054c, 0x0ce6, "DualSense Wireless Controller", GLYPHS_PLAYSTATION, 0},
         {0x057e, 0x2009, "Nintendo Switch Pro Controller", GLYPHS_SWITCH, 0},
+        {0x057e, 0x0337, "Nintendo GameCube Controller Adapter", GLYPHS_GAMECUBE, 0},
+        {0x0f0d, 0x00aa, "Pro Controller", GLYPHS_SWITCH, 0},   /* a third-party Pro pad */
         {0x1234, 0x5678, "Some Pad", GLYPHS_XBOX, 0},
     };
     for (size_t k = 0; k < sizeof want / sizeof *want; k++) {
@@ -311,6 +313,14 @@ static void test_families(void)
     CHECK(glyphs_family(SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_PAIR, 0, 0, "x", 0) ==
               GLYPHS_SWITCH, "Joy-Con pair");
     CHECK(glyphs_family(SDL_CONTROLLER_TYPE_XBOXONE, 0, 0, NULL, 0) == GLYPHS_XBOX, "Xbox One");
+    CHECK(glyphs_family(SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO, 0x20d6, 0xa711, "Wired Controller",
+                        0) == GLYPHS_SWITCH, "a Pro pad with a foreign ID: by SDL's type");
+    CHECK(glyphs_family(SDL_CONTROLLER_TYPE_DS4, 0x054c, 0x09cc, "Pro Controller", 0) ==
+              GLYPHS_PLAYSTATION, "PlayStation type beats the name");
+    CHECK(glyphs_family(SDL_CONTROLLER_TYPE_XBOXONE, 0x045e, 0x02ea, "Xbox One Controller", 0) ==
+              GLYPHS_XBOX, "an Xbox pad is not caught by the Pro rules");
+    CHECK(glyphs_family(SDL_CONTROLLER_TYPE_PS5, 0x054c, 0x0ce6, "DualSense Wireless Controller",
+                        0) == GLYPHS_PLAYSTATION, "DualSense by type");
     CHECK(glyphs_family(SDL_CONTROLLER_TYPE_UNKNOWN, 0, 0, "Steam Deck Controller", 0) ==
               GLYPHS_STEAM_DECK, "by name");
 }
@@ -328,6 +338,13 @@ static void test_glyphs(const char *mask_png)
     CHECK(!strcmp(label, "R5") && (!have || g), "Deck menu action: R5 (%s)", label);
     g = glyphs_lookup_in(GLYPHS_STEAM_DECK, "start", &label);
     CHECK(!strcmp(label, "Menu"), "Deck start: Menu (%s)", label);
+    g = glyphs_lookup_in(GLYPHS_GAMECUBE, "a", &label);
+    CHECK(!g && !strcmp(label, "A"), "GameCube south: text A (%s)", label);
+    g = glyphs_lookup_in(GLYPHS_GAMECUBE, "b", &label);
+    CHECK(!g && !strcmp(label, "X"), "GameCube east: its X (%s)", label);
+    g = glyphs_lookup_in(GLYPHS_GAMECUBE, "r1", &label);
+    CHECK(!g && !strcmp(label, "Z"), "GameCube right shoulder: Z (%s)", label);
+    CHECK(!strcmp(glyphs_family_name(GLYPHS_GAMECUBE), "GameCube"), "GameCube family name");
     g = glyphs_lookup_in(GLYPHS_XBOX, "paddle1", &label);
     CHECK(!g && !strcmp(label, "P1"), "Xbox paddle1: text P1 (%s)", label);
     g = glyphs_lookup_in(GLYPHS_SWITCH, "a", &label);
