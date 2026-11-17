@@ -16,6 +16,8 @@ src = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.p
 tool = os.path.join(src, "tools", "progress_svg.py")
 
 FAKE_RUNS = """[meta]
+title = "Fake title"
+replays_note = "Fake replays note."
 updated = "2000-01-02"
 commit = "abc1234"
 release = "v9.9.9"
@@ -56,7 +58,7 @@ with tempfile.TemporaryDirectory() as tmp:
     assert root.tag.endswith("svg")
     text = " ".join("".join(e.itertext()) for e in root.iter() if e.tag.endswith("text"))
     for want in ("75.0%", "300 of 400", "91.25%", "99.50%", "50.00%", "Fake run one", "Step todo",
-                 "2000-01-02", "abc1234", "v9.9.9", "not measured yet"):
+                 "2000-01-02", "abc1234", "v9.9.9", "not measured yet", "Fake title", "Fake replays note."):
         assert want in text, f"missing {want!r}"
     assert "url(#hatch)" in a and "<script" not in a and "http://www.w3.org/2000/svg" in a
     print("progress_svg: fake data ok")

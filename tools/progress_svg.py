@@ -6,6 +6,9 @@
 usage: progress_svg.py [RUNS_TOML [PROGRESS_MD [OUT_SVG]]]
   defaults: game/ct/progress_runs.toml  game/ct/PROGRESS.md  docs/progress.svg
 
+Everything specific to a game (title, names of replays, notes) comes from RUNS_TOML, so this
+file stays game-agnostic (tools/check_agnostic.py).
+
 Bars: known functions compiled (counts read from PROGRESS.md, written by tools/progress.py);
 the share of executed instructions that ran as native code on each recorded replay (the
 measured values in RUNS_TOML, with a hatched extension to the figure of a branch still in
@@ -61,7 +64,7 @@ def render(runs_toml, progress_md):
     bx, bw = 250, 440
     el = []
     y = 44
-    el.append(t(PAD, y, "Triggered Chrono: road to a fully native Chrono Trigger", 22, TEXT, "bold"))
+    el.append(t(PAD, y, meta["title"], 22, TEXT, "bold"))
     y += 22
     el.append(t(PAD, y, f"Measured {meta['updated']} on commit {meta['commit']} ({meta['release']}). "
                         "Native = compiled C; the rest runs in the built-in interpreter.", 12.5, MUTED))
@@ -98,8 +101,7 @@ def render(runs_toml, progress_md):
               f'stroke="{TODO}" stroke-width="1"/>')
     el.append(t(bx + bw + 16, y + 16, "not measured yet", 13, MUTED))
     y += 40
-    el.append(t(PAD, y, "These figures cover the replays we have (intro, Leene Square, first battle, world map, menu). "
-                        "Whole-game coverage needs recordings of full playthroughs.", 11.5, MUTED))
+    el.append(t(PAD, y, meta["replays_note"], 11.5, MUTED))
 
     y += 40
     el.append(t(PAD, y, "Steps to an interpreter-free recorded playthrough", 14, TEXT, "bold"))
@@ -121,7 +123,7 @@ def render(runs_toml, progress_md):
 
     head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
             f'font-family="{FONT}" role="img" aria-labelledby="ttl">'
-            f'<title id="ttl">Triggered Chrono recompile progress</title>'
+            f'<title id="ttl">{escape(meta["title"])}</title>'
             f'<defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
             f'<rect width="8" height="8" fill="{TRACK}"/><rect width="4" height="8" fill="{WARN}" fill-opacity="0.55"/></pattern>'
             f'<pattern id="hatch2" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'

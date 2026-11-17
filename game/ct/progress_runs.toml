@@ -7,6 +7,8 @@
 # as a result. Replace it with a measured value when that branch lands. Numbers only: no game data.
 
 [meta]
+title = "Triggered Chrono: road to a fully native Chrono Trigger"
+replays_note = "These figures cover the replays we have (intro, Leene Square, first battle, world map, menu). Whole-game coverage needs recordings of full playthroughs."
 updated = "2026-11-17"
 commit = "9ea2211"          # the commit the "native" values were measured on
 release = "v0.1.0-alpha.2"
