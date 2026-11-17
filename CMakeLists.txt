@@ -521,10 +521,20 @@ if(SDL2_FOUND)
     # touch, the tiles' effects and the sheet drawn at 1280x800 and 800x1280, on
     # SDL's dummy video driver with a software renderer; no ROM.
     add_executable(test_quickmenu test/test_quickmenu.c)
-    target_link_libraries(test_quickmenu ct_menu SDL2::SDL2)
+    target_link_libraries(test_quickmenu ct_menu ct_input ct_sched ct_tables_empty SDL2::SDL2)   # port: timectl.c (the Rewind tile) needs the scheduler
     target_compile_options(test_quickmenu PRIVATE ${CT_WARN})
     add_test(NAME quickmenu COMMAND test_quickmenu ${CMAKE_BINARY_DIR})
     set_tests_properties(quickmenu PROPERTIES SKIP_RETURN_CODE 77
+        ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy")
+    # port: the quick menu's time, overlay, controls and save tiles against the
+    # real settings rows (a wrong key leaves a tile out silently): pad, mouse
+    # and finger, the two-press Reset and Restore, reach in both orientations.
+    add_executable(test_quickmenu_tiles test/test_quickmenu_tiles.c frontend/qol.c frontend/saves.c)
+    target_include_directories(test_quickmenu_tiles PRIVATE test)
+    target_link_libraries(test_quickmenu_tiles ct_menu ct_input ct_hd2d ct_sched ct_tables_empty ct_packs SDL2::SDL2)
+    target_compile_options(test_quickmenu_tiles PRIVATE ${CT_WARN})
+    add_test(NAME quickmenu_tiles COMMAND test_quickmenu_tiles ${CMAKE_BINARY_DIR})
+    set_tests_properties(quickmenu_tiles PROPERTIES SKIP_RETURN_CODE 77
         ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy")
     # The 3D diorama's geometry from a scene (frontend/hd2d/scene3d.h)
     add_executable(test_scene3d test/test_scene3d.c)

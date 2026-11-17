@@ -119,8 +119,9 @@ clicks and the back buttons are not SNES buttons.
 
 The **"..." button** (misc1, below the right trackpad on a Deck) opens a sheet of big
 tiles over the paused picture: resume, quick save and load, slot save and load, mute and
-volume, the look, aspect, integer scale, CRT and fullscreen, and **All settings...**
-for the full menu. The game waits behind it. Move the ring with the d-pad or left
+volume, reset, game speed, frame step and rewind, the look, aspect, integer scale, CRT
+and fullscreen, the overlays, the controller and touch options, save file backups and
+restore, and **All settings...** for the full menu. The game waits behind it. Move the ring with the d-pad or left
 stick, **A** runs a tile, left / right adjust the volume slider, **L1 / R1** jump a
 section, **B**, **Start** or "..." again close it. It is made for the 7-inch screen:
 tiles of at least 72 px at 1280x800, four columns held wide, three held tall.

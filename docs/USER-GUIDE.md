@@ -256,12 +256,18 @@ carries on from the same frame.
 
 | Section | Tiles |
 | --- | --- |
-| Game | Resume; Quick save; Quick load; Mute; Slot (pick 1-4), Save to slot, Load slot; Volume (a slider) |
+| Game | Resume; Quick save; Quick load; Mute; Slot (pick 1-4), Save to slot, Load slot; Volume (a slider); Reset (press twice: the console's reset button, back to the title screen) |
+| Time | Game speed (steps through 0.25x to 4x); Rewind length (a slider, 0 is off); Frame step (closes the menu and runs one frame); Rewind (closes the menu and goes back about a second) |
 | Look | Look (cycles the HD-2D look, as R3 does; HD-2D only); Aspect; Integer scale; CRT look; Fullscreen |
+| Overlays | FPS, Clock, Battery, Play time (on / off), Corner (where they sit) |
+| Controls | Swap A/B, Swap X/Y, Dead zone (a slider), Touch size, Touch opacity (sliders), Touch hand |
+| Saves | Back up now; Backup (steps through the dated backups of the save file), Restore (press twice: the save file becomes the chosen backup; the one it replaces is kept) |
 | More | All settings... opens the F10 menu |
 
 Tiles are at least 72 px at 1280x800 and follow the menu text size setting; there are
-four columns on a wide screen, three on a tall one. A tile is a setting the F10 menu
+four columns on a wide screen, three on a tall one. Up and down keep the column they
+started in, so a tile behind a stepper or slider (where left / right adjust) is still
+reached. A tile is a setting the F10 menu
 has too, so the two always agree and `settings.ini` keeps them.
 
 | | Controller | Keyboard | Touch and mouse |
@@ -553,7 +559,7 @@ Sound stops while paused, and the frame timer starts over after.
 
 The two have no controller button by default (the back buttons are taken); bind one with
 `bind_touchpad=rewind`, `bind_misc1=framestep` and the like, or change the keys with
-`key_rewind=` and `key_framestep=`. (Quick menu tiles for these come in a later release.)
+`key_rewind=` and `key_framestep=`. The quick menu's Time tiles do the same.
 
 - **Rewind** keeps a snapshot of the whole machine every 4 frames (about 15 a second),
   as many as `rewind_seconds` allows (default 5, `0` turns it off), compressed against the
@@ -564,7 +570,7 @@ The two have no controller button by default (the back buttons are taken); bind 
   it says so on screen). Snapshots cost about 0.3 ms of CPU every 4 frames on a desktop;
   turn `rewind_seconds` to 0 on a very slow device.
 - **Slow motion**: `slow_speed` is 25, 50, 100, 200, 300 or 400 percent of normal
-  (menu: Controls, Game speed). The sound is off
+  (menu: Controls, Game speed; the quick menu steps through them). The sound is off
   whenever it is not 100, as in fast-forward. Fast-forward multiplies it: 50 with
   fast-forward at 3x runs at 150 percent.
 - **Frame step** advances one frame per press while paused (**P**), with the buttons you are
