@@ -496,10 +496,13 @@ if(SDL2_FOUND)
     add_test(NAME handheld COMMAND test_handheld)
     # port: the Deck-format hidraw reader (frontend/hid_deck.h): reports
     # made from the documented layout, through a fake sysfs and a FIFO
-    add_executable(test_hid_deck test/test_hid_deck.c)
-    target_link_libraries(test_hid_deck ct_input ct_runtime)   # port: ct_runtime: rumble.h
-    target_compile_options(test_hid_deck PRIVATE ${CT_WARN})
-    add_test(NAME hid_deck COMMAND test_hid_deck ${CMAKE_BINARY_DIR}/test_hid_deck_tmp)
+    # Linux only (hidraw, sysfs, FIFOs): on Windows the reader is a stub (hid_deck.c)
+    if(NOT WIN32)
+        add_executable(test_hid_deck test/test_hid_deck.c)
+        target_link_libraries(test_hid_deck ct_input ct_runtime)   # port: ct_runtime: rumble.h
+        target_compile_options(test_hid_deck PRIVATE ${CT_WARN})
+        add_test(NAME hid_deck COMMAND test_hid_deck ${CMAKE_BINARY_DIR}/test_hid_deck_tmp)
+    endif()
     # port: back buttons -> frontend actions, glyphs, gyro, through SDL
     # virtual controllers with paddles
     add_executable(test_actions test/test_actions.c)

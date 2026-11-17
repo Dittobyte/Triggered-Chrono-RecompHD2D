@@ -14,6 +14,7 @@
 #include "harness.h"
 #include "input.h"
 #include "qol.h"
+#include "platform.h"   /* port: Windows: mkdir with no mode, setenv */
 
 static char tmp[4096];
 

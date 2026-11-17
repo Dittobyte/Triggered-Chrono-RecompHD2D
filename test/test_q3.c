@@ -20,6 +20,7 @@
 #include "saves.h"
 #include "settings.h"
 #include "touch.h"
+#include "platform.h"   /* port: Windows: mkdir with no mode, setenv */
 
 static char tmp[4096];
 static time_t now;

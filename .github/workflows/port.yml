@@ -78,7 +78,7 @@ jobs:
           unset CT_ROM
           cmake -S . -B build -G Ninja -DCT_ENGINE_ONLY=ON -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
       - name: Build
-        run: cmake --build build -j "$(nproc)"
+        run: cmake --build build -j "$(nproc)" -- -k 0   # every error at once, not the first
       - name: Test
         run: ctest --test-dir build -LE rom --output-on-failure
 
