@@ -500,5 +500,8 @@ if(SDL2_FOUND)
     list(APPEND ct_game_tests sdl_overlays)
 endif()
 
+# port: the headless tests ignore every real controller (a pad attached to the machine, with the
+# test running, changes what the game sees and records); the *_EXCEPT list holds one device that
+# does not exist. The virtual pads of the C unit tests are not affected (they are not these tests).
 set_tests_properties(${ct_game_tests} PROPERTIES LABELS rom ENVIRONMENT
-    "CT_ROM=${CT_ROM};DSCOTTON_DIR=$ENV{DSCOTTON_DIR};SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy;XDG_DATA_HOME=${CT_TEST_XDG}/data;XDG_CONFIG_HOME=${CT_TEST_XDG}/config")
+    "CT_ROM=${CT_ROM};DSCOTTON_DIR=$ENV{DSCOTTON_DIR};SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy;XDG_DATA_HOME=${CT_TEST_XDG}/data;XDG_CONFIG_HOME=${CT_TEST_XDG}/config;SDL_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT=0x0000/0x0000")

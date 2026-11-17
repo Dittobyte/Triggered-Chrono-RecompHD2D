@@ -1054,10 +1054,20 @@ void draw_tile(ImDrawList *dl, int i, const Rect &r, float k)
                             on ? (sel ? C_ACCENT : C_TEXT) : C_FAINT);
         break;
     }
-    default: {   /* a button with a value: Look, Save to slot */
-        ImVec2 ts = ui_text_size(vsz, armed ? "Again to confirm" : val);
-        ui_text(dl, vsz, ImVec2(r.x + pad, r.y + r.h - pad - ts.y + 2 * k), armed ? C_ACCENT : vcol,
-                armed ? "Again to confirm" : val);
+    default: {   /* a button with a value: Look, Save to slot, Back up now (a status line) */
+        char fit[96];
+        const char *shown = armed ? "Again to confirm" : val;
+        if (ui_text_size(vsz, shown).x > r.w - 2 * pad) {   /* too long for the tile: end it with "..." */
+            snprintf(fit, sizeof fit, "%s", shown);
+            size_t n = strlen(fit);
+            while (n > 4 && ui_text_size(vsz, fit).x > r.w - 2 * pad) {
+                n--;
+                snprintf(fit + (n > 3 ? n - 3 : 0), sizeof fit - (n > 3 ? n - 3 : 0), "...");
+            }
+            shown = fit;
+        }
+        ImVec2 ts = ui_text_size(vsz, shown);
+        ui_text(dl, vsz, ImVec2(r.x + pad, r.y + r.h - pad - ts.y + 2 * k), armed ? C_ACCENT : vcol, shown);
         break;
     }
     }
