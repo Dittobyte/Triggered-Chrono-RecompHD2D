@@ -28,6 +28,7 @@ void ct_dlclose(void *lib);
 const char *ct_dlerror(void);   /* the last failure, for a message; never NULL */
 
 const char *ct_home(void);      /* NULL when unknown */
+const char *ct_tmpdir(void);    /* for tests: $TMPDIR or /tmp; on Windows %TEMP% */
 
 #ifdef _WIN32
 int ct_rename(const char *from, const char *to);   /* replaces an existing file, like rename(2) */

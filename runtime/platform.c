@@ -64,6 +64,17 @@ const char *ct_home(void)
     return h && *h ? h : NULL;
 }
 
+const char *ct_tmpdir(void)
+{
+    /* (TMPDIR may be an MSYS path like /tmp, which a native program can't use) */
+    const char *t = getenv("TEMP");
+    if (!t || !*t)
+        t = getenv("TMP");
+    if (!t || !*t)
+        t = getenv("TMPDIR");
+    return t && *t ? t : ".";
+}
+
 int ct_rename(const char *from, const char *to)
 {
     wchar_t a[MAX_PATH * 2], b[MAX_PATH * 2];
@@ -89,6 +100,12 @@ int ct_link(const char *existing, const char *name)
 #else   /* POSIX */
 
 #include <dlfcn.h>
+
+const char *ct_tmpdir(void)
+{
+    const char *t = getenv("TMPDIR");
+    return t && *t ? t : "/tmp";
+}
 
 void *ct_dlopen(const char *path)
 {

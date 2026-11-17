@@ -73,6 +73,7 @@ jobs:
             mingw-w64-ucrt-x86_64-ninja
             mingw-w64-ucrt-x86_64-SDL2
             mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-git
       - name: Configure
         run: |
           unset CT_ROM

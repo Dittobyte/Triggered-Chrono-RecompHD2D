@@ -404,8 +404,7 @@ static void test_settings(void)
 
 int main(void)
 {
-    const char *t = getenv("TMPDIR");
-    snprintf(tmp, sizeof tmp, "%s/ct_test_q3_XXXXXX", t && *t ? t : "/tmp");
+    snprintf(tmp, sizeof tmp, "%s/ct_test_q3_XXXXXX", ct_tmpdir());
     CHECK(mkdtemp(tmp) != NULL, "mkdtemp");
     test_backups();
     test_overlays();

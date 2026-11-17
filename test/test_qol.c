@@ -148,8 +148,7 @@ static void test_rect(void)
 
 int main(void)
 {
-    const char *t = getenv("TMPDIR");
-    snprintf(tmp, sizeof tmp, "%s/ct_test_qol_XXXXXX", t && *t ? t : "/tmp");
+    snprintf(tmp, sizeof tmp, "%s/ct_test_qol_XXXXXX", ct_tmpdir());
     CHECK(mkdtemp(tmp) != NULL, "mkdtemp(tmp) != NULL");
     test_battery();
     test_pictures();
