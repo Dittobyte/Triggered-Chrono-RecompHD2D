@@ -436,6 +436,8 @@ add_test(NAME ctest_cache_report COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DI
 
 # TAS movie converter on synthetic .bk2/.lsmv movies.
 add_test(NAME tas_convert COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/test_tas_convert.py)
+# README progress picture: valid, shows the data's numbers, committed copy up to date.
+add_test(NAME progress_svg COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/test_progress_svg.py ${CMAKE_SOURCE_DIR})
 add_executable(test_packs test/test_packs.c)   # port: asset packs
 target_link_libraries(test_packs ct_packs ct_runtime)
 target_compile_options(test_packs PRIVATE ${CT_WARN} -Wno-format-truncation)

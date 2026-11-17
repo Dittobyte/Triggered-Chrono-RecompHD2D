@@ -1,0 +1,65 @@
+# SPDX-FileCopyrightText: 2026 jerbanpls
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Measured runs and the road ahead, for tools/progress_svg.py (the README's progress picture).
+# "native" is the share of executed instructions that ran as compiled C (ct_boot --profile) on
+# the named commit. "testing" is a figure from a branch still being gated: shown hatched, never
+# as a result. Replace it with a measured value when that branch lands. Numbers only: no game data.
+
+[meta]
+updated = "2026-11-17"
+commit = "9ea2211"          # the commit the "native" values were measured on
+release = "v0.1.0-alpha.2"
+
+[[run]]
+name = "Boot, 1500 frames"
+native = 97.99
+testing = 99.80
+
+[[run]]
+name = "Leene Square replay, 9200 frames"
+native = 96.43
+testing = 99.89
+
+[[run]]
+name = "Gato battle replay, 11000 frames"
+native = 96.92
+testing = 99.91
+
+[[run]]
+name = "World map replay, 12800 frames"
+native = 94.63
+testing = 99.86
+
+# state: done | testing | todo
+[[step]]
+name = "alpha.1: first public build"
+state = "done"
+
+[[step]]
+name = "alpha.2: 87.9% of known functions, quick menu, plain look default"
+state = "done"
+
+[[step]]
+name = "alpha.3: next compiler round (99%+ on the replays)"
+state = "testing"
+
+[[step]]
+name = "Record the whole game in chapters"
+state = "todo"
+
+[[step]]
+name = "Coverage report: which functions no recording reaches"
+state = "todo"
+
+[[step]]
+name = "Trap build: list every entry into the interpreter"
+state = "todo"
+
+[[step]]
+name = "Close the list (RAM code, jump tables, stubs)"
+state = "todo"
+
+[[step]]
+name = "Zero interpreted instructions across the recorded game"
+state = "todo"
