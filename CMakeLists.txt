@@ -486,12 +486,12 @@ if(SDL2_FOUND)
     add_test(NAME input COMMAND test_input)
     # port: the touch overlay's input logic (frontend/touch.h)
     add_executable(test_touch test/test_touch.c)
-    target_link_libraries(test_touch ct_input)
+    target_link_libraries(test_touch ct_input ct_runtime)   # port: ct_runtime: platform.h
     target_compile_options(test_touch PRIVATE ${CT_WARN})
     add_test(NAME touch COMMAND test_touch)
     # port: handheld controls through an SDL virtual game controller
     add_executable(test_handheld test/test_handheld.c)
-    target_link_libraries(test_handheld ct_input)
+    target_link_libraries(test_handheld ct_input ct_runtime)   # port: ct_runtime: platform.h
     target_compile_options(test_handheld PRIVATE ${CT_WARN})
     add_test(NAME handheld COMMAND test_handheld)
     # port: the Deck-format hidraw reader (frontend/hid_deck.h): reports
