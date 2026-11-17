@@ -29,15 +29,15 @@ controller, and open enough that anyone can help finish it.
 |---|---|
 | Plays | The original game from the intro through the replays we test: Leene Square, the first battle, the world map, the field menu. Whole-game coverage is **not proven yet** (that is the next big milestone, see below). |
 | Looks | The original picture by default. HD-2D (flat or 3D diorama) is one switch away: menu, Look tab, or `--hd2d`. Presets from light to full, tuned for the Steam Deck and ROG Ally. |
-| Recompiled | 1990 of 2263 known functions are native C; 98% of a boot's instructions run native. The built-in interpreter covers the rest, so the game is complete either way. A further round of compiler work measures above 99% and is next. |
-| Comfort | Quick menu on F1, rewind, slow motion, frame step, save backups, corner overlays (FPS, clock, battery, play time), A/B and X/Y swap, touch controls. |
+| Recompiled | Every function we have found (2115) is native C, and 99.8% to 99.9% of the instructions in each of our replays run as native code. The built-in interpreter covers the rest, so the game is complete either way. "Found so far" is the catch: only recordings of the whole game can show what we have not reached. |
+| Comfort | Quick menu on F1 (time, look, overlays, controls and save tiles), rewind, slow motion, frame step, save backups, corner overlays (FPS, clock, battery, play time), A/B and X/Y swap, player lights on pads that have them, touch controls. |
 | Not yet | Windows, Android and Flatpak builds are not published. Controller work for the 2026 Steam Controller is planned. Expect rough edges. |
 
-![Progress to a fully native Chrono Trigger: 87.9% of known functions compiled, 94.6% to 98.0% of instructions native on the recorded replays, whole-game coverage not yet measured](docs/progress.svg)
+![Progress to a fully native Chrono Trigger: every known function compiled, 99.8% to 99.9% of instructions native on the recorded replays, whole-game coverage not yet measured](docs/progress.svg)
 
-*What the bars mean:* the first is how many of the game's known routines are compiled to native C. The next four are how much of what actually
-executes in each replay we recorded runs as that compiled code instead of the interpreter. The hatched ends are the next compiler round, still
-under test. The empty bar is the honest part: we cannot claim the whole game until it is recorded.
+*What the bars mean:* the first is how many of the game's known routines are compiled to native C ("known" means found so far; 260 more labels were
+checked and are data, not code). The next four are how much of what actually executes in each replay we recorded runs as that compiled code instead of
+the interpreter. The empty bar is the honest part: we cannot claim the whole game until it is recorded.
 Source data: [game/ct/progress_runs.toml](game/ct/progress_runs.toml); regenerate with `python3 tools/progress_svg.py`.
 
 Download the latest pre-release from [Releases](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/releases)

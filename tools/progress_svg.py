@@ -74,6 +74,9 @@ def render(runs_toml, progress_md):
     y += 14
     el += bar(PAD, y, bx + bw - PAD, 22, done / known, OK)
     el.append(t(bx + bw + 16, y + 16, f"{100.0 * done / known:.1f}%  ({done} of {known})", 13))
+    if meta.get("functions_note"):
+        el.append(t(PAD, y + 40, meta["functions_note"], 11.5, MUTED))
+        y += 20
 
     y += 56
     el.append(t(PAD, y, "Instructions that run as native code, per recorded replay", 14, TEXT, "bold"))
@@ -91,8 +94,9 @@ def render(runs_toml, progress_md):
             label += f"  next: {r['testing']:.2f}%"
         el.append(t(bx + bw + 16, y + 3, label, 12.5))
     y += 22
-    el.append(f'<rect x="{PAD}" y="{y}" width="12" height="10" fill="url(#hatch)" stroke="{WARN}" stroke-width="1"/>')
-    el.append(t(PAD + 18, y + 9, "figure from the next compiler round, still being tested (not a result yet)", 11.5, MUTED))
+    if any("testing" in r for r in runs):
+        el.append(f'<rect x="{PAD}" y="{y}" width="12" height="10" fill="url(#hatch)" stroke="{WARN}" stroke-width="1"/>')
+        el.append(t(PAD + 18, y + 9, "figure from the next compiler round, still being tested (not a result yet)", 11.5, MUTED))
 
     y += 44
     el.append(t(PAD, y, "The whole game, every scene", 14, TEXT, "bold"))

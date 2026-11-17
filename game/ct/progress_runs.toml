@@ -8,30 +8,27 @@
 
 [meta]
 title = "Triggered Chrono: road to a fully native Chrono Trigger"
+functions_note = "Known = found so far by the recompiler and the replays. A further 260 labels were checked and are data, not code. This is not a whole-game claim."
 replays_note = "These figures cover the replays we have (intro, Leene Square, first battle, world map, menu). Whole-game coverage needs recordings of full playthroughs."
 updated = "2026-11-17"
-commit = "9ea2211"          # the commit the "native" values were measured on
-release = "v0.1.0-alpha.2"
+commit = "0fa4d48"          # the commit the "native" values were measured on
+release = "main after the round 2 compiler push"
 
 [[run]]
 name = "Boot, 1500 frames"
-native = 97.99
-testing = 99.80
+native = 99.80
 
 [[run]]
 name = "Leene Square replay, 9200 frames"
-native = 96.43
-testing = 99.89
+native = 99.89
 
 [[run]]
 name = "Gato battle replay, 11000 frames"
-native = 96.92
-testing = 99.91
+native = 99.91
 
 [[run]]
 name = "World map replay, 12800 frames"
-native = 94.63
-testing = 99.86
+native = 99.86
 
 # state: done | testing | todo
 [[step]]
@@ -39,12 +36,12 @@ name = "alpha.1: first public build"
 state = "done"
 
 [[step]]
-name = "alpha.2: 87.9% of known functions, quick menu, plain look default"
+name = "alpha.2: quick menu, plain look default, 94-98% native"
 state = "done"
 
 [[step]]
-name = "alpha.3: next compiler round (99%+ on the replays)"
-state = "testing"
+name = "Round 2 compiler push: 99%+ on every replay (on main)"
+state = "done"
 
 [[step]]
 name = "Record the whole game in chapters"
