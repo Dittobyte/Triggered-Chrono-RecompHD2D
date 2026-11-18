@@ -315,7 +315,7 @@ static void test_families(void)
     CHECK(glyphs_family(SDL_CONTROLLER_TYPE_XBOXONE, 0, 0, NULL, 0) == GLYPHS_XBOX, "Xbox One");
     CHECK(glyphs_family(SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO, 0x20d6, 0xa711, "Wired Controller",
                         0) == GLYPHS_SWITCH, "a Pro pad with a foreign ID: by SDL's type");
-    CHECK(glyphs_family(SDL_CONTROLLER_TYPE_DS4, 0x054c, 0x09cc, "Pro Controller", 0) ==
+    CHECK(glyphs_family(SDL_CONTROLLER_TYPE_PS4, 0x054c, 0x09cc, "Pro Controller", 0) ==
               GLYPHS_PLAYSTATION, "PlayStation type beats the name");
     CHECK(glyphs_family(SDL_CONTROLLER_TYPE_XBOXONE, 0x045e, 0x02ea, "Xbox One Controller", 0) ==
               GLYPHS_XBOX, "an Xbox pad is not caught by the Pro rules");
