@@ -337,6 +337,12 @@ function(ct_engine_exe name)
     target_compile_options(${name} PRIVATE ${CT_WARN})
     set_target_properties(${name} PROPERTIES ENABLE_EXPORTS ON
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+    # port: zig's COFF linker exports nothing for -rdynamic; the cross build
+    # (packaging/windows/build.sh) passes a .def file listing the engine's
+    # symbols, which also makes zig write the import library <name>.lib.
+    if(WIN32 AND CT_EXE_DEF)
+        target_link_libraries(${name} ${CT_EXE_DEF})
+    endif()
 endfunction()
 if(CT_ANDROID)
     # port: the engine-only SDL frontend as libmain.so, which SDLActivity
