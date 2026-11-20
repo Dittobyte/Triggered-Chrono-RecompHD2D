@@ -1,61 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="732" viewBox="0 0 900 732" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="ttl"><title id="ttl">Triggered Chrono: road to a fully native Chrono Trigger</title><defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#1d2b3c"/><rect width="4" height="8" fill="#e0a84a" fill-opacity="0.55"/></pattern><pattern id="hatch2" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#0e1621"/><rect width="4" height="8" fill="#5b6b80" fill-opacity="0.35"/></pattern></defs><rect x="0.5" y="0.5" width="899" height="731" rx="10" fill="#0e1621" stroke="#243447"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="752" viewBox="0 0 900 752" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="ttl"><title id="ttl">Triggered Chrono: road to a fully native Chrono Trigger</title><defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#1d2b3c"/><rect width="4" height="8" fill="#e0a84a" fill-opacity="0.55"/></pattern><pattern id="hatch2" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#0e1621"/><rect width="4" height="8" fill="#5b6b80" fill-opacity="0.35"/></pattern></defs><rect x="0.5" y="0.5" width="899" height="751" rx="10" fill="#0e1621" stroke="#243447"/>
 <text x="28" y="44" font-size="22" font-weight="bold" fill="#e6edf3" text-anchor="start">Triggered Chrono: road to a fully native Chrono Trigger</text>
-<text x="28" y="66" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Measured 2026-11-17 on commit 9ea2211 (v0.1.0-alpha.2). Native = compiled C; the rest runs in the built-in interpreter.</text>
+<text x="28" y="66" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Measured 2026-11-17 on commit 0fa4d48 (main after the round 2 compiler push). Native = compiled C; the rest runs in the built-in interpreter.</text>
 <text x="28" y="104" font-size="14" font-weight="bold" fill="#e6edf3" text-anchor="start">Known functions compiled to native C</text>
 <rect x="28" y="118" width="662" height="22" rx="4" fill="#1d2b3c"/>
-<rect x="28" y="118" width="582.1" height="22" rx="4" fill="#3fb6a8"/>
-<text x="706" y="134" font-size="13" font-weight="normal" fill="#e6edf3" text-anchor="start">87.9%  (1990 of 2263)</text>
-<text x="28" y="174" font-size="14" font-weight="bold" fill="#e6edf3" text-anchor="start">Instructions that run as native code, per recorded replay</text>
-<text x="28" y="220" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Boot, 1500 frames</text>
-<rect x="250" y="204" width="440" height="18" rx="4" fill="#1d2b3c"/>
-<rect x="250" y="204" width="431.2" height="18" rx="4" fill="#3fb6a8"/>
-<rect x="681.2" y="204" width="8.0" height="18" fill="url(#hatch)" stroke="#e0a84a" stroke-width="1"/>
-<text x="706" y="219" font-size="12.5" font-weight="normal" fill="#e6edf3" text-anchor="start">97.99%  next: 99.80%</text>
-<text x="28" y="252" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Leene Square replay, 9200 frames</text>
-<rect x="250" y="236" width="440" height="18" rx="4" fill="#1d2b3c"/>
-<rect x="250" y="236" width="424.3" height="18" rx="4" fill="#3fb6a8"/>
-<rect x="674.3" y="236" width="15.2" height="18" fill="url(#hatch)" stroke="#e0a84a" stroke-width="1"/>
-<text x="706" y="251" font-size="12.5" font-weight="normal" fill="#e6edf3" text-anchor="start">96.43%  next: 99.89%</text>
-<text x="28" y="284" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Gato battle replay, 11000 frames</text>
-<rect x="250" y="268" width="440" height="18" rx="4" fill="#1d2b3c"/>
-<rect x="250" y="268" width="426.4" height="18" rx="4" fill="#3fb6a8"/>
-<rect x="676.4" y="268" width="13.2" height="18" fill="url(#hatch)" stroke="#e0a84a" stroke-width="1"/>
-<text x="706" y="283" font-size="12.5" font-weight="normal" fill="#e6edf3" text-anchor="start">96.92%  next: 99.91%</text>
-<text x="28" y="316" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">World map replay, 12800 frames</text>
-<rect x="250" y="300" width="440" height="18" rx="4" fill="#1d2b3c"/>
-<rect x="250" y="300" width="416.4" height="18" rx="4" fill="#3fb6a8"/>
-<rect x="666.4" y="300" width="23.0" height="18" fill="url(#hatch)" stroke="#e0a84a" stroke-width="1"/>
-<text x="706" y="315" font-size="12.5" font-weight="normal" fill="#e6edf3" text-anchor="start">94.63%  next: 99.86%</text>
-<rect x="28" y="334" width="12" height="10" fill="url(#hatch)" stroke="#e0a84a" stroke-width="1"/>
-<text x="46" y="343" font-size="11.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">figure from the next compiler round, still being tested (not a result yet)</text>
-<text x="28" y="378" font-size="14" font-weight="bold" fill="#e6edf3" text-anchor="start">The whole game, every scene</text>
-<rect x="28" y="392" width="662" height="22" rx="4" fill="url(#hatch2)" stroke="#5b6b80" stroke-width="1"/>
-<text x="706" y="408" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">not measured yet</text>
-<text x="28" y="432" font-size="11.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">These figures cover the replays we have (intro, Leene Square, first battle, world map, menu). Whole-game coverage needs recordings of full playthroughs.</text>
-<text x="28" y="472" font-size="14" font-weight="bold" fill="#e6edf3" text-anchor="start">Steps to an interpreter-free recorded playthrough</text>
-<circle cx="35" cy="494" r="6" fill="#3fb6a8"/>
-<text x="52" y="498" font-size="13" font-weight="normal" fill="#e6edf3" text-anchor="start">alpha.1: first public build</text>
-<text x="872" y="498" font-size="12" font-weight="normal" fill="#3fb6a8" text-anchor="end">done</text>
-<circle cx="35" cy="520" r="6" fill="#3fb6a8"/>
-<text x="52" y="524" font-size="13" font-weight="normal" fill="#e6edf3" text-anchor="start">alpha.2: 87.9% of known functions, quick menu, plain look default</text>
-<text x="872" y="524" font-size="12" font-weight="normal" fill="#3fb6a8" text-anchor="end">done</text>
-<circle cx="35" cy="546" r="6" fill="#e0a84a"/>
-<text x="52" y="550" font-size="13" font-weight="normal" fill="#e6edf3" text-anchor="start">alpha.3: next compiler round (99%+ on the replays)</text>
-<text x="872" y="550" font-size="12" font-weight="normal" fill="#e0a84a" text-anchor="end">in testing</text>
-<circle cx="35" cy="572" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
-<text x="52" y="576" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Record the whole game in chapters</text>
-<text x="872" y="576" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
-<circle cx="35" cy="598" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
-<text x="52" y="602" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Coverage report: which functions no recording reaches</text>
-<text x="872" y="602" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
-<circle cx="35" cy="624" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
-<text x="52" y="628" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Trap build: list every entry into the interpreter</text>
-<text x="872" y="628" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
-<circle cx="35" cy="650" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
-<text x="52" y="654" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Close the list (RAM code, jump tables, stubs)</text>
-<text x="872" y="654" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
-<circle cx="35" cy="676" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
-<text x="52" y="680" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Zero interpreted instructions across the recorded game</text>
-<text x="872" y="680" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
-<text x="28" y="706" font-size="11.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">The interpreter stays in the program as the test referee and last-resort fallback; the goal is that play never reaches it.</text>
+<rect x="28" y="118" width="662.0" height="22" rx="4" fill="#3fb6a8"/>
+<text x="706" y="134" font-size="13" font-weight="normal" fill="#e6edf3" text-anchor="start">100.0%  (2115 of 2115)</text>
+<text x="28" y="158" font-size="11.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Known = found so far by the recompiler and the replays. A further 260 labels were checked and are data, not code. This is not a whole-game claim.</text>
+<text x="28" y="194" font-size="14" font-weight="bold" fill="#e6edf3" text-anchor="start">Instructions that run as native code, per recorded replay</text>
+<text x="28" y="240" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Boot, 1500 frames</text>
+<rect x="250" y="224" width="440" height="18" rx="4" fill="#1d2b3c"/>
+<rect x="250" y="224" width="439.1" height="18" rx="4" fill="#3fb6a8"/>
+<text x="706" y="239" font-size="12.5" font-weight="normal" fill="#e6edf3" text-anchor="start">99.80%</text>
+<text x="28" y="272" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Leene Square replay, 9200 frames</text>
+<rect x="250" y="256" width="440" height="18" rx="4" fill="#1d2b3c"/>
+<rect x="250" y="256" width="439.5" height="18" rx="4" fill="#3fb6a8"/>
+<text x="706" y="271" font-size="12.5" font-weight="normal" fill="#e6edf3" text-anchor="start">99.89%</text>
+<text x="28" y="304" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">Gato battle replay, 11000 frames</text>
+<rect x="250" y="288" width="440" height="18" rx="4" fill="#1d2b3c"/>
+<rect x="250" y="288" width="439.6" height="18" rx="4" fill="#3fb6a8"/>
+<text x="706" y="303" font-size="12.5" font-weight="normal" fill="#e6edf3" text-anchor="start">99.91%</text>
+<text x="28" y="336" font-size="12.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">World map replay, 12800 frames</text>
+<rect x="250" y="320" width="440" height="18" rx="4" fill="#1d2b3c"/>
+<rect x="250" y="320" width="439.4" height="18" rx="4" fill="#3fb6a8"/>
+<text x="706" y="335" font-size="12.5" font-weight="normal" fill="#e6edf3" text-anchor="start">99.86%</text>
+<text x="28" y="398" font-size="14" font-weight="bold" fill="#e6edf3" text-anchor="start">The whole game, every scene</text>
+<rect x="28" y="412" width="662" height="22" rx="4" fill="url(#hatch2)" stroke="#5b6b80" stroke-width="1"/>
+<text x="706" y="428" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">not measured yet</text>
+<text x="28" y="452" font-size="11.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">These figures cover the replays we have (intro, Leene Square, first battle, world map, menu). Whole-game coverage needs recordings of full playthroughs.</text>
+<text x="28" y="492" font-size="14" font-weight="bold" fill="#e6edf3" text-anchor="start">Steps to an interpreter-free recorded playthrough</text>
+<circle cx="35" cy="514" r="6" fill="#3fb6a8"/>
+<text x="52" y="518" font-size="13" font-weight="normal" fill="#e6edf3" text-anchor="start">alpha.1: first public build</text>
+<text x="872" y="518" font-size="12" font-weight="normal" fill="#3fb6a8" text-anchor="end">done</text>
+<circle cx="35" cy="540" r="6" fill="#3fb6a8"/>
+<text x="52" y="544" font-size="13" font-weight="normal" fill="#e6edf3" text-anchor="start">alpha.2: quick menu, plain look default, 94-98% native</text>
+<text x="872" y="544" font-size="12" font-weight="normal" fill="#3fb6a8" text-anchor="end">done</text>
+<circle cx="35" cy="566" r="6" fill="#3fb6a8"/>
+<text x="52" y="570" font-size="13" font-weight="normal" fill="#e6edf3" text-anchor="start">Round 2 compiler push: 99%+ on every replay (on main)</text>
+<text x="872" y="570" font-size="12" font-weight="normal" fill="#3fb6a8" text-anchor="end">done</text>
+<circle cx="35" cy="592" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
+<text x="52" y="596" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Record the whole game in chapters</text>
+<text x="872" y="596" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
+<circle cx="35" cy="618" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
+<text x="52" y="622" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Coverage report: which functions no recording reaches</text>
+<text x="872" y="622" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
+<circle cx="35" cy="644" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
+<text x="52" y="648" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Trap build: list every entry into the interpreter</text>
+<text x="872" y="648" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
+<circle cx="35" cy="670" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
+<text x="52" y="674" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Close the list (RAM code, jump tables, stubs)</text>
+<text x="872" y="674" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
+<circle cx="35" cy="696" r="6" fill="none" stroke="#5b6b80" stroke-width="2"/>
+<text x="52" y="700" font-size="13" font-weight="normal" fill="#8b9bb0" text-anchor="start">Zero interpreted instructions across the recorded game</text>
+<text x="872" y="700" font-size="12" font-weight="normal" fill="#5b6b80" text-anchor="end">to do</text>
+<text x="28" y="726" font-size="11.5" font-weight="normal" fill="#8b9bb0" text-anchor="start">The interpreter stays in the program as the test referee and last-resort fallback; the goal is that play never reaches it.</text>
 </svg>

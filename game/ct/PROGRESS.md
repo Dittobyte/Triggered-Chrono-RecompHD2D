@@ -4,18 +4,19 @@ Written by `tools/progress.py`. Do not edit by hand.
 
 | Metric | Value |
 |---|---|
-| Routines recompiled | 1990 |
-| Emitted C functions (routine x entry state) | 2085 |
-| ROM bytes covered | 175822 |
-| Functions known total (validated + pending + unresolved) | 2263 |
-| Functions validated | 1990 |
-| Functions unresolved (pending sync) | 273 |
+| Routines recompiled | 2115 |
+| Emitted C functions (routine x entry state) | 2250 |
+| ROM bytes covered | 185901 |
+| Functions known total (validated + pending + unresolved) | 2115 |
+| Functions validated | 2115 |
+| Functions unresolved (pending sync) | 0 |
+| Labels that are not code (not counted as functions) | 260 |
 | Manual roots not yet emittable | 0 |
 | Opcodes implemented | 253 / 256 |
-| Opcodes used by recompiled routines | 210 / 256 |
+| Opcodes used by recompiled routines | 213 / 256 |
 | Opcode x width combinations implemented | 446 |
-| Tests passing | 129 / 133 |
-| Test assertions checked | 623468046 |
+| Tests passing | 137 / 141 |
+| Test assertions checked | 624423185 |
 
 ## Coverage by bank
 
@@ -23,17 +24,17 @@ Written by `tools/progress.py`. Do not edit by hand.
 |---|---|
 | $00 | 15 |
 | $0B | 297 |
-| $C0 | 59273 |
+| $C0 | 60624 |
 | $C1 | 57327 |
-| $C2 | 22955 |
-| $C3 | 1873 |
-| $C7 | 1401 |
+| $C2 | 28805 |
+| $C3 | 2643 |
+| $C7 | 2643 |
 | $CC | 4911 |
 | $CD | 6486 |
 | $CE | 348 |
-| $CF | 4349 |
-| $D1 | 2265 |
-| $FD | 13522 |
+| $CF | 4622 |
+| $D1 | 2643 |
+| $FD | 13737 |
 | $FF | 800 |
 
 ## Symbol sync by bank
@@ -42,17 +43,17 @@ Written by `tools/progress.py`. Do not edit by hand.
 |---|---|---|---|
 | $00 | 3 | 0 | 3 |
 | $0B | 1 | 0 | 1 |
-| $C0 | 596 | 273 | 869 |
+| $C0 | 611 | 0 | 611 |
 | $C1 | 613 | 0 | 613 |
-| $C2 | 431 | 0 | 431 |
-| $C3 | 31 | 0 | 31 |
-| $C7 | 8 | 0 | 8 |
+| $C2 | 522 | 0 | 522 |
+| $C3 | 39 | 0 | 39 |
+| $C7 | 11 | 0 | 11 |
 | $CC | 13 | 0 | 13 |
 | $CD | 133 | 0 | 133 |
 | $CE | 3 | 0 | 3 |
-| $CF | 31 | 0 | 31 |
-| $D1 | 18 | 0 | 18 |
-| $FD | 101 | 0 | 101 |
+| $CF | 33 | 0 | 33 |
+| $D1 | 20 | 0 | 20 |
+| $FD | 105 | 0 | 105 |
 | $FF | 8 | 0 | 8 |
 
 ## Routines
@@ -476,7 +477,7 @@ Written by `tools/progress.py`. Do not edit by hand.
 | Map_BuildTilePropGrid | $C0A521 | m1x0 | 330 | bankc0 |
 | Field_CopyMapRectLayers | $C0AF4E | m1x0 | 328 | bankc0 |
 | Field_CopyMapRectMVN | $C0B096 | m1x0 | 80 | bankc0 |
-| ReentryVectors | $C00000 | m1x0 | 173 | bankc0 |
+| ReentryVectors | $C00000 | m1x0 | 127 | bankc0 |
 | _C0L27EB | $C027EB | m1x0 | 57 | bankc0 |
 | Field_RebuildScreenAndSettleFull | $C02848 | m1x0 | 36 | bankc0 |
 | Field_RebuildScreen | $C0286C | m1x0 | 62 | bankc0 |
@@ -888,7 +889,7 @@ Written by `tools/progress.py`. Do not edit by hand.
 | Sub_C28E1E | $C28E1E | m1x1 | 15 | bankc2 |
 | Mode7Engine_Entry | $C30000 | m1x0 | 101 | bankc3 |
 | Gfx_DecompressEntry | $C30557 | m1x0, m0x0 | 860 | bankc3 |
-| Audio_Init_Entry | $C70000 | m1x0 | 282 | bankc7 |
+| Audio_Init_Entry | $C70000 | m1x0 | 267 | bankc7 |
 | MainInit | $FDC000 | m1x0, m0x0 | 215 | bankfd |
 | FdCore_EffectPpuSetup | $FDC0D7 | m1x0 | 77 | bankfd |
 | FdCore_EffectStateInit | $FDC124 | m1x0 | 202 | bankfd |
@@ -1601,18 +1602,18 @@ Written by `tools/progress.py`. Do not edit by hand.
 | Menu_DrawMainMenuOptionPanel | $C29B54 | m1x0 | 17 | bankc2 |
 | Menu_HighlightMainMenuOption | $C29B8F | m1x0 | 79 | bankc2 |
 | Menu_PlaceMainMenuCursorBar | $C29BDE | m0x0 | 75 | bankc2 |
-| Menu_HighlightPanel3Rows | $C29E76 | m0x0 | 58 | bankc2 |
+| Menu_HighlightPanel3Rows | $C29E76 | m0x0, m1x1 | 58 | bankc2 |
 | Menu_SetPanelAttrNibbleBoth | $C29EB0 | m0x0 | 29 | bankc2 |
 | Menu_MakeDimmedPalette | $C2A0E7 | m0x0 | 26 | bankc2 |
 | Menu_DrawCharListRows | $C2A1B2 | m1x0 | 55 | bankc2 |
 | Menu_SetCharPanelParams | $C2A1EF | m0x0, m1x0 | 39 | bankc2 |
 | Menu_DrawCharListRowPanel | $C2A216 | m0x0 | 9 | bankc2 |
 | Menu_DrawCharTypeIcon | $C2A273 | m1x0 | 83 | bankc2 |
-| Menu_HighlightItemTabStrip | $C2B6AE | m1x0 | 37 | bankc2 |
+| Menu_HighlightItemTabStrip | $C2B6AE | m1x0, m1x1 | 37 | bankc2 |
 | Menu_DrawTechCharPanel | $C2BA2F | m0x0 | 32 | bankc2 |
 | Menu_DrawTechCharStrip | $C2BA4F | m1x0 | 173 | bankc2 |
 | MenuSprite_PlaceCharRowSprite | $C2BAFC | m0x0 | 30 | bankc2 |
-| Menu_DrawConfigToggles | $C2C3E4 | m0x0 | 55 | bankc2 |
+| Menu_DrawConfigToggles | $C2C3E4 | m0x0, m1x0 | 55 | bankc2 |
 | Menu_ConfigCopySettings | $C2C43A | m0x0 | 28 | bankc2 |
 | Menu_ConfigHighlightRows | $C2C456 | m0x0 | 63 | bankc2 |
 | Menu_HighlightConfigChoice | $C2C47A | m0x0 | 27 | bankc2 |
@@ -1643,7 +1644,7 @@ Written by `tools/progress.py`. Do not edit by hand.
 | MenuOverlay_DrawWindowCurrentStyle | $C2ECDB | m0x0 | 45 | bankc2 |
 | MenuOverlay_DrawWindowBorder | $C2EDF6 | m1x0, m0x0 | 45 | bankc2 |
 | MenuOverlay_FillWindowBackground | $C2EE7F | m1x0, m0x0 | 118 | bankc2 |
-| Menu_CopyTilemapRectCmd | $C2EF05 | m1x0 | 38 | bankc2 |
+| Menu_CopyTilemapRectCmd | $C2EF05 | m1x0, m0x0 | 38 | bankc2 |
 | Menu_DrawNumber | $C2F114 | m0x0, m1x0 | 43 | bankc2 |
 | Menu_BinToBcd | $C2F13F | m1x0 | 59 | bankc2 |
 | Menu_DrawBcdDigits | $C2F1DA | m1x0 | 49 | bankc2 |
@@ -1651,7 +1652,7 @@ Written by `tools/progress.py`. Do not edit by hand.
 | Menu_DrawPlayTime | $C2F28D | m0x0, m1x0 | 63 | bankc2 |
 | Menu_ReadHourMinByte | $C2F2CC | m1x0 | 16 | bankc2 |
 | Menu_GetItemNamePtr | $C2F2E2 | m0x0 | 17 | bankc2 |
-| MenuSprite_AssignChars0to6 | $C2F566 | m1x0 | 34 | bankc2 |
+| MenuSprite_AssignChars0to6 | $C2F566 | m1x0, m1x1 | 34 | bankc2 |
 | MenuSprite_ClearAllSlots | $C2F588 | m1x0 | 31 | bankc2 |
 | MenuSprite_LoadSpriteDefsAndD1Recs | $C2F5A7 | m1x0, m0x0 | 70 | bankc2 |
 | Menu_MulRowOffset | $C2F626 | m1x0, m0x0 | 29 | bankc2 |
@@ -2041,14 +2042,139 @@ Written by `tools/progress.py`. Do not edit by hand.
 | Menu_CallSlotVector | $C20553 | m1x0 | 3 | bankc2 |
 | Sub_C21807 | $C21807 | m0x0 | 18 | bankc2 |
 | Menu_CallVia5B | $C21819 | m1x0 | 3 | bankc2 |
-| MenuTask_Sleep | $C2821E | m0x0, m1x0 | 122 | bankc2 |
-| MenuTask_SleepFrames | $C2822B | m1x0 | 120 | bankc2 |
+| MenuTask_Sleep | $C2821E | m0x0, m1x0, m0x1 | 125 | bankc2 |
+| MenuTask_SleepFrames | $C2822B | m1x0 | 123 | bankc2 |
 | Menu_FadeOutBrightness | $C283CA | m1x0 | 60 | bankc2 |
 | Menu_FadeBrightnessStep | $C283D0 | m1x0 | 54 | bankc2 |
 | Sub_C2EF48 | $C2EF48 | m1x0 | 29 | bankc2 |
 | Menu_DrawString | $C2EF65 | m1x0, m0x0 | 25 | bankc2 |
 | Menu_DrawStringLoop | $C2EF7E | m0x0, m1x0 | 25 | bankc2 |
 | Menu_TextControlCode | $C2EFBE | m1x0 | 21 | bankc2 |
+| Loc_C0220E | $C0220E | m1x0 | 91 | bankc0 |
+| Loc_C02269 | $C02269 | m1x0 | 111 | bankc0 |
+| Loc_C022D8 | $C022D8 | m1x0 | 82 | bankc0 |
+| _C0L2329 | $C02329 | m1x0 | 1 | bankc0 |
+| Loc_C0232A | $C0232A | m1x0 | 96 | bankc0 |
+| Loc_C0238A | $C0238A | m1x0 | 127 | bankc0 |
+| _C0L23E2 | $C023E2 | m1x0 | 39 | bankc0 |
+| Loc_C02409 | $C02409 | m1x0 | 267 | bankc0 |
+| Loc_C02514 | $C02514 | m1x0 | 117 | bankc0 |
+| Loc_C02589 | $C02589 | m1x0 | 133 | bankc0 |
+| Loc_C0260E | $C0260E | m1x0 | 65 | bankc0 |
+| Loc_C0264F | $C0264F | m1x0 | 237 | bankc0 |
+| ScreenFx_RequestVector | $C30008 | m1x0 | 338 | bankc3 |
+| ScreenFx_TickVector | $C3000E | m1x0 | 261 | bankc3 |
+| ScreenFx_Vector3 | $C30011 | m1x0 | 62 | bankc3 |
+| ScreenFx_FillLineTable | $C301C6 | m0x0 | 30 | bankc3 |
+| ScreenFx_FillLineTableAtX | $C301CA | m0x0 | 26 | bankc3 |
+| ScreenFx_MixRandom | $C302DD | m1x0 | 42 | bankc3 |
+| C2Scene_TaskRunScript | $C20F63 | m1x0 | 46 | bankc2 |
+| Sub_C21DD4 | $C21DD4 | m1x0 | 100 | bankc2 |
+| Sub_C220A2 | $C220A2 | m1x0 | 9 | bankc2 |
+| Sub_C22105 | $C22105 | m1x0 | 9 | bankc2 |
+| Sub_C22F0F | $C22F0F | m1x0 | 63 | bankc2 |
+| Sub_C22F94 | $C22F94 | m1x0 | 9 | bankc2 |
+| Sub_C2309E | $C2309E | m1x0 | 35 | bankc2 |
+| Sub_C23264 | $C23264 | m1x0 | 17 | bankc2 |
+| Sub_C23404 | $C23404 | m1x0 | 41 | bankc2 |
+| Sub_C23AE2 | $C23AE2 | m1x0 | 45 | bankc2 |
+| Sub_C25628 | $C25628 | m1x0 | 15 | bankc2 |
+| C2Scene_PlaceBelowView | $C2754D | m1x0 | 40 | bankc2 |
+| Sub_C27575 | $C27575 | m1x0 | 35 | bankc2 |
+| Sub_C27598 | $C27598 | m1x0 | 43 | bankc2 |
+| Sub_C275C3 | $C275C3 | m1x0 | 58 | bankc2 |
+| Sub_C278A1 | $C278A1 | m1x0 | 66 | bankc2 |
+| BankC2_Entry8000 | $C28000 | m1x0 | 295 | bankc2 |
+| Sub_C28213 | $C28213 | m1x0, m0x0 | 3 | bankc2 |
+| Sub_C283BD | $C283BD | m0x0 | 114 | bankc2 |
+| Menu_Draw4IndexedStrings | $C2A6F0 | m1x0 | 46 | bankc2 |
+| Menu_ItemCursorRowSelect | $C2AD2E | m1x0 | 34 | bankc2 |
+| Menu_RefreshTechRowMpState | $C2BB1F | m1x0 | 123 | bankc2 |
+| Menu_TechGetPartners | $C2BBD6 | m1x0 | 76 | bankc2 |
+| Menu_ComputeTechMpCost | $C2BC22 | m1x0 | 55 | bankc2 |
+| Menu_ApplyMpCostStuds | $C2BC59 | m0x0, m1x0 | 22 | bankc2 |
+| Menu_ConfigUpdateDesc | $C2C4BC | m1x0 | 61 | bankc2 |
+| PointersToRo_C2EFF4 | $C2EFF4 | m0x0 | 17 | bankc2 |
+| PointersToRo_C2F005 | $C2F005 | m0x0 | 12 | bankc2 |
+| PointersToRo_C2F011 | $C2F011 | m0x0 | 20 | bankc2 |
+| PointersToRo_C2F036 | $C2F036 | m0x0 | 53 | bankc2 |
+| PointersToRo_C2F068 | $C2F068 | m0x0 | 9 | bankc2 |
+| PointersToRo_C2F08D | $C2F08D | m0x0 | 21 | bankc2 |
+| PointersToRo_C2F0A2 | $C2F0A2 | m0x0 | 22 | bankc2 |
+| PointersToRo_C2F0B8 | $C2F0B8 | m0x0 | 9 | bankc2 |
+| PointersToRo_C2F0D1 | $C2F0D1 | m0x0 | 67 | bankc2 |
+| Menu_DrawDescStringCC2EB1 | $C2F2F3 | m1x0 | 63 | bankc2 |
+| Menu_UpdateDescWindowFF | $C2F943 | m1x0 | 111 | bankc2 |
+| Audio_ServiceExit | $C70192 | m1x0 | 15 | bankc7 |
+| Audio_PlaySongCmd | $C701A1 | m1x0 | 1162 | bankc7 |
+| Audio_SendPlaySongCmd | $C70A39 | m1x0 | 95 | bankc7 |
+| BattleCF_ExitBattle | $CFFBE5 | m1x0 | 273 | bankcf |
+| Loc_C02725 | $C02725 | m1x0 | 40 | bankc0 |
+| Jumps7E0500Memory | $C0FF10 | m1x0, m0x0, m1x1, m0x1 | 4 | bankc0 |
+| CODE_C0FF14 | $C0FF14 | m1x0, m0x0, m1x1, m0x1 | 4 | bankc0 |
+| Menu_NmiHandler | $C2015E | m0x0, m1x0, m0x1, m1x1 | 487 | bankc2 |
+| Menu_IrqHandler | $C20345 | m0x0, m1x0, m0x1, m1x1 | 1 | bankc2 |
+| Mode7_NmiHandler | $C30548 | m0x0, m1x0, m0x1, m1x1 | 15 | bankc3 |
+| Mode7_IrqHandler | $C30529 | m0x0, m1x0, m0x1, m1x1 | 31 | bankc3 |
+| Battle_NmiHandler | $D1E77C | m0x0, m1x0, m0x1, m1x1 | 285 | bankd1 |
+| Battle_IrqHandler | $D1FE97 | m0x0, m1x0, m0x1, m1x1 | 93 | bankd1 |
+| Boot_NmiHandler | $FDDE15 | m0x0, m1x0, m0x1, m1x1 | 114 | bankfd |
+| Boot_IrqHandler | $FDDE87 | m0x0, m1x0, m0x1, m1x1 | 17 | bankfd |
+| Sub_C220AF | $C220AF | m1x0 | 86 | bankc2 |
+| Sub_C220DF | $C220DF | m1x0 | 38 | bankc2 |
+| Sub_C22116 | $C22116 | m1x0 | 67 | bankc2 |
+| Sub_C22152 | $C22152 | m1x0 | 36 | bankc2 |
+| Sub_C2216F | $C2216F | m1x0 | 37 | bankc2 |
+| Loc_C22345 | $C22345 | m0x0 | 14 | bankc2 |
+| Loc_C22353 | $C22353 | m0x0 | 38 | bankc2 |
+| Loc_C22379 | $C22379 | m0x0 | 47 | bankc2 |
+| Sub_C22FA5 | $C22FA5 | m1x0 | 151 | bankc2 |
+| Sub_C22FAE | $C22FAE | m1x0 | 142 | bankc2 |
+| Sub_C230CD | $C230CD | m1x0 | 219 | bankc2 |
+| Sub_C23279 | $C23279 | m1x0 | 62 | bankc2 |
+| Sub_C23439 | $C23439 | m1x0 | 36 | bankc2 |
+| Sub_C2563F | $C2563F | m1x0 | 310 | bankc2 |
+| Sub_C25663 | $C25663 | m1x0 | 274 | bankc2 |
+| Sub_C25699 | $C25699 | m1x0 | 220 | bankc2 |
+| Sub_C256F9 | $C256F9 | m1x0 | 124 | bankc2 |
+| Menu_BuildSortedEquipList | $C28953 | m1x0, m0x0 | 137 | bankc2 |
+| Menu_DrawBlinkRowMarker | $C289FA | m0x0 | 55 | bankc2 |
+| Menu_CursorBlinkGate | $C28B6E | m1x0 | 23 | bankc2 |
+| Menu_ApplyListScrollInput | $C293BF | m1x0 | 78 | bankc2 |
+| Menu_DrawCharDetailPanel | $C2A22F | m1x0 | 68 | bankc2 |
+| Menu_DrawSelLabelString | $C2A38B | m1x0 | 47 | bankc2 |
+| Menu_HighlightTabStripAt | $C2A3ED | m0x0 | 45 | bankc2 |
+| Menu_WindowScrollStepDown | $C2A7B7 | m1x0 | 165 | bankc2 |
+| Menu_WindowScrollStepUp | $C2A970 | m1x0 | 150 | bankc2 |
+| Menu_WriteTileByte | $C2AA19 | m1x0 | 27 | bankc2 |
+| Menu_WmdataWrite3 | $C2AA23 | m1x0 | 17 | bankc2 |
+| InventoryMenu_AB62 | $C2AB62 | m1x0 | 135 | bankc2 |
+| InventoryMenu_ABE9 | $C2ABE9 | m1x1 | 41 | bankc2 |
+| Menu_DrawItemListRows | $C2AE43 | m1x0 | 34 | bankc2 |
+| Menu_SetItemRowParams | $C2AE65 | m0x0 | 16 | bankc2 |
+| Menu_SetItemRowParamsY | $C2AE75 | m1x0 | 124 | bankc2 |
+| Menu_SubTabCursorInput | $C2B520 | m1x0 | 72 | bankc2 |
+| TechMenu_B568 | $C2B568 | m1x1 | 96 | bankc2 |
+| TechMenu_B5C8 | $C2B5C8 | m0x0 | 230 | bankc2 |
+| Menu_TechRebuildOnSelChange | $C2BC6F | m1x1 | 63 | bankc2 |
+| Tech_RebuildLists | $C2BCAE | m1x0 | 31 | bankc2 |
+| Tech_BuildGroupList | $C2BCCD | m1x1 | 51 | bankc2 |
+| Tech_BuildAvailableList | $C2BD00 | m1x1 | 64 | bankc2 |
+| Menu_DrawTechListRows | $C2BD6B | m1x0 | 46 | bankc2 |
+| Menu_DrawTechListRow | $C2BD99 | m0x0 | 25 | bankc2 |
+| Menu_DrawTechName | $C2BDB2 | m1x0 | 57 | bankc2 |
+| Menu_DrawTechBit6Marker | $C2BDEB | m1x0 | 22 | bankc2 |
+| Menu_DrawTechTabText | $C2BE16 | m1x1 | 82 | bankc2 |
+| Menu_ConfigCursorTick | $C2BFD4 | m1x0 | 43 | bankc2 |
+| PartyMenu_Init | $C2C9E5 | m1x0 | 126 | bankc2 |
+| NameEntry_SetupScreen | $C2E40E | m1x0 | 304 | bankc2 |
+| Menu_ClampListCursorRow | $C2EA53 | m1x0, m1x1 | 46 | bankc2 |
+| PointersToRo_C2F071 | $C2F071 | m0x0 | 31 | bankc2 |
+| Menu_DrawIndexedString7D00 | $C2F2DC | m0x0 | 6 | bankc2 |
+| Menu_RunTextToCompletion | $C2FAA8 | m0x0 | 68 | bankc2 |
+| Sub_CFFCF5 | $CFFCF5 | m1x0 | 1 | bankcf |
+| M7Scene_UploadOam | $FDF222 | m1x0 | 42 | bankfd |
+| M7Scene_UploadPalette | $FDF266 | m1x0 | 42 | bankfd |
 
 ## Implemented opcodes
 
@@ -2080,6 +2206,7 @@ $00 BRK imm, $01 ORA dp_x_ind, $02 COP imm, $03 ORA sr, $04 TSB dp, $05 ORA dp, 
 | ref_compare_report | Passed |
 | ctest_cache_report | Passed |
 | tas_convert | Passed |
+| progress_svg | Failed |
 | packs | Passed |
 | install_layout | Passed |
 | music | Passed |
@@ -2095,9 +2222,13 @@ $00 BRK imm, $01 ORA dp_x_ind, $02 COP imm, $03 ORA sr, $04 TSB dp, $05 ORA dp, 
 | hid_deck | Passed |
 | actions | Passed |
 | qol | Passed |
+| timectl | Passed |
+| q3 | Passed |
 | settings | Passed |
+| quickmenu | Passed |
 | scene3d | Passed |
 | check_agnostic | Passed |
+| timectl_rewind_replay | Passed |
 | module_parity | Passed |
 | music_pack | Passed |
 | scene_decode | Passed |
@@ -2131,8 +2262,9 @@ $00 BRK imm, $01 ORA dp_x_ind, $02 COP imm, $03 ORA sr, $04 TSB dp, $05 ORA dp, 
 | diff_all_6 | Passed |
 | diff_all_7 | Passed |
 | diff_open_bus | Passed |
-| sync_determinism | Failed |
+| sync_determinism | Passed |
 | manual_root | Passed |
+| notcode | Passed |
 | discover_loop | Passed |
 | decompress | Passed |
 | boot_interp | Passed |
@@ -2191,3 +2323,5 @@ $00 BRK imm, $01 ORA dp_x_ind, $02 COP imm, $03 ORA sr, $04 TSB dp, $05 ORA dp, 
 | sdl_3d_box | Passed |
 | sdl_menu | Passed |
 | sdl_menu_hd2d | Passed |
+| sdl_quickmenu | Passed |
+| sdl_overlays | Passed |
