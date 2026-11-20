@@ -138,8 +138,14 @@ def main(argv: list[str]) -> int:
         run([py, os.path.join(ROOT, 'tools', 'check_rom.py'), game, rom])
 
         step('decoding overlays')
+        # (the overlay tool writes this folder's paths into a TOML string: on
+        # Windows they need forward slashes, and a closing one so its joins
+        # use them too)
+        ovdir = os.path.join(gen, 'overlays')
+        if WINDOWS:
+            ovdir = ovdir.replace('\\', '/') + '/'
         run([py, os.path.join(game, 'tools', 'overlay_images.py'), os.path.join(game, 'overlays.toml'),
-             os.path.join(gen, 'overlays')], env)
+             ovdir], env)
 
         step('translating to C')
         funcs = os.path.join(game, 'funcs.toml')

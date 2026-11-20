@@ -6,13 +6,21 @@
 #
 #   packaging/windows/test-wine.sh OUT ctest
 #   packaging/windows/test-wine.sh OUT module
-#   packaging/windows/test-wine.sh OUT rom ROMFILE (not implemented yet)
+#   packaging/windows/test-wine.sh OUT rom ROMFILE
 #
 # module: in a throwaway Wine prefix, PATH holding only the package's Python
 # and zig, builds packaging/windows/synth (the smallest valid game module, no
 # game data) with tools/build_module.py --synth and loads it with
 # ct_boot_engine.exe --module; prints WIN-MODULE-OK when the engine reports the
 # module's two functions.
+#
+# rom: copies ROMFILE into the throwaway container (never into the package),
+# runs ct_sdl_engine.exe --rom ... --fast --frames 600 --script leene_square
+# so the first-run path builds ct_game.dll with the bundled Python and zig
+# (the program prints "exit: --frames 600 reached"), then builds a second
+# module for ct_boot_engine.exe (no -march=native) and writes OUT/win-hash.log.
+# Compare it with OUT/linux-hash.log (win2/linux-ref.sh). Same zig-on-Wine
+# workaround and cache as module.
 #
 # ctest: cross-builds every test program next to the engine in OUT/build
 # (build.sh must have run), then runs the ROM-free set (ctest -LE rom) as
@@ -26,10 +34,10 @@ out=$(cd "$1" && pwd)
 mode=$2
 case $mode in
 ctest|module) ;;
-rom) echo "test-wine.sh: mode $mode is not implemented yet" >&2; exit 2 ;;
+rom) rom=${3:-}; [ -f "$rom" ] || { echo "usage: test-wine.sh OUT rom ROMFILE" >&2; exit 2; } ;;
 *) echo "test-wine.sh: unknown mode $mode" >&2; exit 2 ;;
 esac
-if [ "$mode" = module ]; then
+if [ "$mode" = module ] || [ "$mode" = rom ]; then
     [ -f "$out/stage/python/python.exe" ] && [ -f "$out/stage/zig/zig.exe" ] ||
         { echo "test-wine.sh: run build.sh $out first (the package has no python/zig)" >&2; exit 1; }
     rc=0
@@ -40,14 +48,36 @@ if [ "$mode" = module ]; then
     python3 -I "$here/wine-zig/patch-zig.py" "$out/stage/zig/zig.exe" "$out/wzig"
     distrobox enter ct-build -- sh -c 'export ZIG_GLOBAL_CACHE_DIR="$1/zig-cache"; "$1/tools/zig/zig" cc -target x86_64-windows-gnu -shared -O2 -o "$1/wzig/ntdlx.dll" "$2/wine-zig/shim.c" "$1/wzig/ntdlx.def"' \
         sh "$out" "$here" >"$out/module-test.log" 2>&1 || { cat "$out/module-test.log"; echo "test-wine.sh: building the Wine zig shim failed" >&2; exit 1; }
-    rm -rf "$out/stage/synth"; cp -r "$here/synth" "$out/stage/synth"
-    trap 'rm -rf "$out/stage/synth"' EXIT
+    if [ "$mode" = module ]; then
+        rm -rf "$out/stage/synth"; cp -r "$here/synth" "$out/stage/synth"
+        trap 'rm -rf "$out/stage/synth"' EXIT
+    else
+        rm -rf "$out/stage/rom-test.bat"; cp "$here/rom-test.bat" "$out/stage/rom-test.bat"
+        trap 'rm -f "$out/stage/rom-test.bat"' EXIT
+        rm -rf "$out/rom-out"; mkdir -p "$out/rom-out"
+    fi
     # zig builds the mingw-w64 runtime for the DLL on first use: about half an hour
     # under Wine. Its cache is kept in OUT/wine-zig-cache (CT_WINE_FRESH=1 starts
     # over), so only the first run is slow. The Wine prefix itself is new every run.
     [ -z "${CT_WINE_FRESH:-}" ] || rm -rf "$out/wine-zig-cache"
     mkdir -p "$out/wine-zig-cache"
-    CT_WINE_PODMAN_ARGS="-v $out/wzig:/home/wine/prefix/drive_c/wzig:ro -v $out/wine-zig-cache:/home/wine/prefix/drive_c/zcache" "$here/wine.sh" "$out" -- wine cmd /c 'mkdir C:\work & C:\pkg\synth\test-module.bat' >"$out/module-test.log" 2>&1 || rc=$?
+    c=/home/wine/prefix/drive_c
+    if [ "$mode" = rom ]; then
+        # the ROM and the replay are visible read-only; the hash log comes out in rom-out
+        CT_WINE_PODMAN_ARGS="-v $out/wzig:$c/wzig:ro -v $out/wine-zig-cache:$c/zcache -v $rom:$c/rom/ct.sfc:ro -v $repo/game/ct/test/replay:$c/replay:ro -v $out/rom-out:$c/out" \
+            "$here/wine.sh" "$out" -- wine cmd /c 'C:\pkg\rom-test.bat' >"$out/rom-test.log" 2>&1 || rc=$?
+        cat "$out/rom-test.log"
+        # (the Windows C runtime writes text files with CR LF line ends: the only
+        # difference from the Linux log; drop the CRs, nothing else is touched)
+        [ ! -s "$out/rom-out/win-hash.log" ] || tr -d '\r' < "$out/rom-out/win-hash.log" > "$out/win-hash.log"
+        if [ $rc -eq 0 ] && grep -q 'exit: --frames 600 reached' "$out/rom-test.log"; then
+            echo "exit: --frames 600 reached (ct_sdl_engine.exe), hash log $out/win-hash.log"
+            exit 0
+        fi
+        echo "test-wine.sh: the ROM run did not finish (exit $rc)" >&2
+        exit 1
+    fi
+    CT_WINE_PODMAN_ARGS="-v $out/wzig:$c/wzig:ro -v $out/wine-zig-cache:$c/zcache" "$here/wine.sh" "$out" -- wine cmd /c 'mkdir C:\work & C:\pkg\synth\test-module.bat' >"$out/module-test.log" 2>&1 || rc=$?
     cat "$out/module-test.log"
     if [ $rc -eq 0 ] && grep -q 'ct_boot: game module .*ct_synth.dll: 2 functions' "$out/module-test.log"; then
         echo WIN-MODULE-OK

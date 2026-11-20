@@ -45,4 +45,11 @@ enum { FIRSTRUN_MODULE, FIRSTRUN_INTERP, FIRSTRUN_QUIT, FIRSTRUN_ERROR };
    window; FIRSTRUN_ERROR: a setup problem, printed to stderr. */
 int firstrun(const firstrun_opts *o);
 
+#ifdef _WIN32
+/* Windows: call first thing in main. With no valid standard handles (a GUI
+   program started from the Explorer), stdout and stderr go to ct_sdl.log in
+   the preferences folder; with a console or redirection they are left alone. */
+void firstrun_log_redirect(const char *game_id);
+#endif
+
 #endif

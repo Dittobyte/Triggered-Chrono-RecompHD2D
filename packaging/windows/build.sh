@@ -68,7 +68,7 @@ export ZIG_GLOBAL_CACHE_DIR="$out/zig-cache" ZIG_LOCAL_CACHE_DIR="$out/zig-cache
 bld="$out/build"
 cmake -S "$repo" -B "$bld" -G "${CMAKE_GENERATOR:-Unix Makefiles}" \
     -DCMAKE_TOOLCHAIN_FILE="$repo/cmake/zig-windows.cmake" \
-    -DCMAKE_BUILD_TYPE=Release -DCT_ENGINE_ONLY=ON \
+    -DCMAKE_BUILD_TYPE=Release -DCT_ENGINE_ONLY=ON -DCT_ENGINE_DATA_DIR:STRING=. \
     -DCMAKE_PREFIX_PATH="$sdl" -DCMAKE_INSTALL_PREFIX="$out/stage"
 build() { cmake --build "$bld" -j "${JOBS:-$(nproc)}" --target ct_sdl_engine ct_boot_engine; }
 build
@@ -109,10 +109,21 @@ python3 -c 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.arg
     "$dl/python-embed.zip" "$out/stage/python"
 # the embeddable build ignores PYTHONPATH and the script folder: the _pth file
 # lists what `import` searches (the zip, this folder, the package's tools)
-printf 'python313.zip\n.\n../tools\n' > "$out/stage/python/python313._pth"
+printf 'python313.zip\n.\n../tools\n../recomp\n' > "$out/stage/python/python313._pth"
 mkdir -p "$out/stage/tools" "$out/stage/runtime"
 cp "$repo/tools/build_module.py" "$out/stage/tools/"
 cp "$repo"/runtime/*.h "$repo/runtime/module_entry.c" "$out/stage/runtime/"
+# the data folder (the exe's own folder, "."): what build_module.py reads, as
+# the Linux install rules do: tools, the translator and each game's configuration
+mkdir -p "$out/stage/recomp"
+cp "$repo"/tools/*.py "$out/stage/tools/"
+cp "$repo"/recomp/*.py "$out/stage/recomp/"
+for g in "$repo"/game/*/; do
+    [ -f "$g/game.toml" ] || continue
+    gid=$(basename "$g"); mkdir -p "$out/stage/game/$gid/tools"
+    cp "$g"/*.toml "$g"/*.c "$g"/*.h "$out/stage/game/$gid/" 2>/dev/null || true
+    cp "$g"/tools/*.py "$out/stage/game/$gid/tools/" 2>/dev/null || true
+done
 cp "$out/ct_engine.def" "$out/stage/"   # the exports the import libraries were made from
 
 rm -f "$out/CT_Recomp-win64.zip"
