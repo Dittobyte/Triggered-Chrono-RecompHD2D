@@ -7,11 +7,14 @@ Original artwork: capitals drawn on a 5x7 grid below, plus the time-ring from
 packaging/icons/make_icons.py. No fonts, nothing traced, no game imagery.
 
   packaging/branding/make_logo.py      writes triggered-chrono-{stacked,horizontal,wordmark}.svg/.png here
-                                       and the Steam library logo packaging/steam/artwork/logo.png
+                                       and the Steam logo, grid and wide capsule in packaging/steam/artwork/
 
 PNGs use rsvg-convert, else ImageMagick. The outputs are committed.
 """
-import os, shutil, subprocess, sys
+import os, shutil, subprocess, sys, tempfile
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "icons"))
+import make_icons as mi
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 G = {"T": "11111,00100,00100,00100,00100,00100,00100", "R": "11110,10001,10001,11110,10100,10010,10001",
@@ -122,6 +125,22 @@ def png(svg, out, width):
         exe = shutil.which("magick") or shutil.which("convert")
         subprocess.run([exe, "-background", "none", "-density", "300", svg, "-resize", f"{width}x", out], check=True)
 
+def steam_cards(wordmark_png):
+    """Grid and wide capsule: the icon script's backdrop and emblem, with the new wordmark composed on top."""
+    art = os.path.join(HERE, "..", "steam", "artwork")
+    exe = shutil.which("magick") or shutil.which("convert")
+    cards = {"grid.png": (600, 900, mi.backdrop(600, 900, 1) + mi.place(100, 150, 400), 520, "+40+585"),
+             "capsule_wide.png": (920, 430, mi.backdrop(920, 430, 2) + mi.place(40, 15, 400), 440, "+455+120")}
+    with tempfile.TemporaryDirectory() as tmp:
+        for name, (w, h, body, ww, off) in cards.items():
+            svg = os.path.join(tmp, name + ".svg")
+            open(svg, "w").write(mi.wrap(w, h, body))
+            out = os.path.join(art, name)
+            mi.rasteriser()(svg, out, w, h)
+            subprocess.run([exe, out, "(", wordmark_png, "-resize", f"{ww}x", ")", "-geometry", off,
+                            "-composite", out], check=True)
+            print("wrote steam/artwork/" + name)
+
 if __name__ == "__main__":
     for kind in ("stacked", "horizontal", "wordmark"):
         W, H, s = build(kind)
@@ -135,3 +154,5 @@ if __name__ == "__main__":
             subprocess.run([exe, p[:-4] + ".png", "-resize", "x680", "-background", "none", "-gravity", "center",
                             "-extent", "1280x720", dst], check=True)
             print("wrote steam/artwork/logo.png")
+        if kind == "wordmark":
+            steam_cards(p[:-4] + ".png")

@@ -151,22 +151,18 @@ def wrap(w, h, body):
 
 
 def steam_svgs():
-    """name -> (width, height, svg)"""
+    """name -> (width, height, svg). The name text is added by packaging/branding/make_logo.py."""
     cream = "#fff3d0"
     tw = text_width("CT RECOMP", 10)
     out = {}
     out["grid.png"] = (600, 900, wrap(600, 900, backdrop(600, 900, 1)
-                       + place(100, 150, 400)
-                       + word("CT RECOMP", (600 - tw) // 2, 620, 10, cream)))
+                       + place(100, 150, 400)))
     out["capsule_wide.png"] = (920, 430, wrap(920, 430, backdrop(920, 430, 2)
-                               + place(40, 15, 400)
-                               + word("CT RECOMP", 450, 150, 8, cream)))
+                               + place(40, 15, 400)))
     out["hero.png"] = (1920, 620, wrap(1920, 620, backdrop(1920, 620, 3)
                        + place(1380, 90, 440)))
     px = 18
-    out["logo.png"] = (1280, 720, wrap(1280, 720, place(440, 20, 400)
-                       + word("CT RECOMP", (1280 - text_width("CT RECOMP", px)) // 2,
-                              480, px, cream)))
+    out["logo.png"] = (1280, 720, wrap(1280, 720, place(440, 20, 400)))
     out["icon.png"] = (256, 256, icon_svg())
     return out
 
