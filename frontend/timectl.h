@@ -46,6 +46,7 @@ void timectl_speed_set(int pct);      /* the nearest of those; saved in settings
 void timectl_speed_step(int dir);     /* +1 next faster, -1 next slower; stops at the ends */
 void timectl_rewind(int down);        /* hold: 1 starts, 0 resumes */
 int timectl_rewinding(void);
+void timectl_rewind_for(int frames);  /* hold for about `frames` frames of game time, then let go */
 void timectl_frame_step(void);
 int timectl_paused_step_pending(void);
 

@@ -299,7 +299,7 @@ int main(int argc, char **argv)
     CHECK(quickmenu_focus() >= 0, "held repeat is safe");
     open_fresh();
     tap_button(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);   /* a page: next section */
-    CHECK(!strcmp(quickmenu_tile_title(quickmenu_focus()), "Look"), "R1 to the Look section: %s",
+    CHECK(!strcmp(quickmenu_tile_title(quickmenu_focus()), "Frame step"), "R1 to the next section (Time; its rows are not registered here): %s",
           quickmenu_tile_title(quickmenu_focus()));
     tap_button(SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
     CHECK(quickmenu_focus() == 0, "L1 back to Game: %d", quickmenu_focus());

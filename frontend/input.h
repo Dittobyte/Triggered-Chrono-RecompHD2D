@@ -103,11 +103,23 @@ int quit_combo_masks(const quit_combo *q);
      (Steam's udev rules). Not on Android, where it means a Bluetooth
      permission prompt;
    - SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS=0: face buttons by
-     position on Nintendo pads too, as input_controller assumes.
+     position on Nintendo pads too, as input_controller assumes;
+   - SDL_HINT_JOYSTICK_HIDAPI_COMBINE_JOY_CONS=1 and ..._VERTICAL_JOY_CONS=0:
+     a left and a right Joy-Con are one pad, a single one is used as it is;
+   - the PS5, Switch and Xbox 360 player-LED hints, on, or off with
+     settings.ini pad_leds=off. Each hint is guarded by #ifdef: the SDL
+     2.30 headers on CI may lack one.
    A hint already in the environment wins. Under Steam Input, Steam hides
    the physical pads from SDL (SDL_GAMECONTROLLER_IGNORE_DEVICES): the
    virtual pad is used as before. */
 void input_sdl_hints(int native_steam);
+/* settings.ini pad_leds: 1 (auto, the default) or 0 (off). */
+int input_pad_leds(void);
+/* Tell a pad which player it is (0..2): SDL_GameControllerSetPlayerIndex,
+   and a fixed light colour (P1 blue, P2 red, P3 green) if it has a light.
+   Does nothing when pad_leds=off or pad is NULL. Call again when a pad
+   changes slot. */
+void input_pad_extras_apply(SDL_GameController *pad, int player);
 /* Steam Input is giving this process its virtual pad instead of the real
    ones (Steam's environment variables); why gets the variable. */
 int input_under_steam_input(const char **why);

@@ -1961,6 +1961,14 @@ static void pads_changed(void)
     }
 }
 
+/* port: each open pad is told its player number and light (input.c). */
+static void pads_extras(void)
+{
+    input_pad_extras_apply(pad, 0);
+    input_pad_extras_apply(pad2, 1);
+    input_pad_extras_apply(pad3, 2);
+}
+
 /* port: gyro aiming, once a frame (settings.ini gyro=on). The 3D
    diorama's camera follows pad 1's gyro, if it has one. */
 static void gyro_frame(void)
@@ -2138,6 +2146,7 @@ static void poll_input(long f)
         } else if (ev.type == SDL_CONTROLLERDEVICEADDED && !pad) {
             pad = open_controller();
             pads_changed();   /* port */
+            pads_extras();
             if (pad) {
                 fprintf(stderr, "ct_sdl: using \"%s\" on pad 1\n", SDL_GameControllerName(pad));
                 use_glyphs_of(pad);
@@ -2148,6 +2157,7 @@ static void poll_input(long f)
             else if (!pad3)
                 pad3 = open_controller_except2(pad, pad2);
             pads_changed();
+            pads_extras();
         } else if (ev.type == SDL_CONTROLLERDEVICEREMOVED) {
             pads_changed();   /* port: before the pads move up */
             rumble_out_stop_all();   /* port: every pad still; the next frame reassigns them */
@@ -2166,6 +2176,7 @@ static void poll_input(long f)
             }
             if (!pad)
                 pad = open_controller();
+            pads_extras();   /* port: the pads moved up a slot */
         }
     }
     {   /* port: back buttons / grips -> frontend actions, on any pad */
@@ -3562,6 +3573,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "ct_sdl: second controller \"%s\"\n", SDL_GameControllerName(pad2));
     if (pad3)
         fprintf(stderr, "ct_sdl: third controller \"%s\"\n", SDL_GameControllerName(pad3));
+    pads_extras();
     coop_update();
     /* port: frontend actions (actions.h): stubs say so on screen until
        something implements them; the menu shows what the buttons do. */
