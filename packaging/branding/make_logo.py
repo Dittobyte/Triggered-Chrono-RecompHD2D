@@ -7,6 +7,7 @@ Original artwork: capitals drawn on a 5x7 grid below, plus the time-ring from
 packaging/icons/make_icons.py. No fonts, nothing traced, no game imagery.
 
   packaging/branding/make_logo.py      writes triggered-chrono-{stacked,horizontal,wordmark}.svg/.png here
+                                       and the Steam library logo packaging/steam/artwork/logo.png
 
 PNGs use rsvg-convert, else ImageMagick. The outputs are committed.
 """
@@ -128,3 +129,9 @@ if __name__ == "__main__":
         open(p, "w").write(s)
         png(p, p[:-4] + ".png", 1200 if kind != "horizontal" else 1600)
         print("wrote", os.path.basename(p))
+        if kind == "stacked":  # Steam library logo: 1280x720, transparent, centred
+            exe = shutil.which("magick") or shutil.which("convert")
+            dst = os.path.join(HERE, "..", "steam", "artwork", "logo.png")
+            subprocess.run([exe, p[:-4] + ".png", "-resize", "x680", "-background", "none", "-gravity", "center",
+                            "-extent", "1280x720", dst], check=True)
+            print("wrote steam/artwork/logo.png")

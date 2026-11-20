@@ -1,3 +1,5 @@
+<p align="center"><img src="packaging/branding/triggered-chrono-stacked.png" alt="Triggered Chrono" width="420"></p>
+
 # Triggered Chrono
 
 An unofficial, fan-made static recompilation of Chrono Trigger (SNES, US 1.0) into a native
@@ -159,3 +161,11 @@ assets are **not included** and remain the property of their copyright
 holders — you must supply your own legally obtained ROM via `$CT_ROM`.
 Symbol names are credited to dscotton/ct_disassembly (public domain) and
 ChronoRET. See `THIRD_PARTY.md` for vendored/adapted third-party code.
+
+## Credits
+
+Triggered Chrono is built on **[ct-recomp](https://github.com/ThisIsAkill/ct-recomp)** by
+**Akhil Moola** (MIT licence, copyright 2026 Akhil Moola). The recompiler, runtime and much of the
+frontend and test suite come from that project, and its full commit history (165 commits) is kept in this
+repository. Thank you, Akhil, for the foundation this work stands on. The upstream licence text is in
+`LICENSES/MIT.txt` and the details of what came from where are in `THIRD_PARTY.md` and `CREDITS.md`.
