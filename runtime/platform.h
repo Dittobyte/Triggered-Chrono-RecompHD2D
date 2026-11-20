@@ -33,6 +33,7 @@ const char *ct_tmpdir(void);    /* for tests: $TMPDIR or /tmp; on Windows %TEMP%
 #ifdef _WIN32
 int ct_rename(const char *from, const char *to);   /* replaces an existing file, like rename(2) */
 int ct_link(const char *existing, const char *name);   /* a hard link; -1 if the volume has none */
+char *ct_mkdtemp(char *tmpl);   /* like mkdtemp(3): "...XXXXXX" becomes a new directory */
 #endif
 
 #ifdef __cplusplus
@@ -55,6 +56,7 @@ int ct_link(const char *existing, const char *name);   /* a hard link; -1 if the
 #define fsync(fd) _commit(fd)
 #define rename(from, to) ct_rename((from), (to))
 #define link(existing, name) ct_link((existing), (name))
+#define mkdtemp(tmpl) ct_mkdtemp((tmpl))
 #define lstat(path, st) stat((path), (st))
 #define realpath(path, out) _fullpath((out), (path), 4096)
 #define setenv(name, value, overwrite) _putenv_s((name), (value))

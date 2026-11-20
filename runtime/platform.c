@@ -97,6 +97,28 @@ int ct_link(const char *existing, const char *name)
     return CreateHardLinkW(b, a, NULL) ? 0 : -1;
 }
 
+/* mkdtemp: mingw-w64 headers differ on declaring it, so it is always ours. */
+char *ct_mkdtemp(char *tmpl)
+{
+    static const char set[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+    size_t n = strlen(tmpl);
+    if (n < 6 || strcmp(tmpl + n - 6, "XXXXXX") != 0)
+        return NULL;
+    unsigned long seed = (unsigned long)GetTickCount() ^ ((unsigned long)GetCurrentProcessId() << 8);
+    for (int tries = 0; tries < 200; tries++) {
+        unsigned long v = seed + (unsigned long)tries * 2654435761UL;
+        for (int i = 0; i < 6; i++) {
+            tmpl[n - 6 + i] = set[v % (sizeof set - 1)];
+            v = v / 7 + 12345 + (unsigned long)i * 977;
+        }
+        if (CreateDirectoryA(tmpl, NULL))
+            return tmpl;
+        if (GetLastError() != ERROR_ALREADY_EXISTS)
+            return NULL;
+    }
+    return NULL;
+}
+
 #else   /* POSIX */
 
 #include <dlfcn.h>
