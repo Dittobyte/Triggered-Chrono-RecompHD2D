@@ -25,6 +25,12 @@ fi
 ZIG_URL=https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz
 ZIG_SHA=02aa270f183da276e5b5920b1dac44a63f1a49e55050ebde3aecc9eb82f93239
 SDL_URL=https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-devel-2.32.10-mingw.tar.gz
+ZIGWIN_URL=https://ziglang.org/download/0.15.2/zig-x86_64-windows-0.15.2.zip
+ZIGWIN_SHA=3a0ed1e8799a2f8ce2a6e6290a9ff22e6906f8227865911fb7ddedc3cc14cb0c
+# newest 3.13 patch with an embeddable zip that is at least two weeks old (2026-11-20);
+# python.org lists only MD5, so this SHA-256 is the one recorded at first download
+PY_URL=https://www.python.org/ftp/python/3.13.17/python-3.13.17-embed-amd64.zip
+PY_SHA=9e35319bffedab8b36ad44d8f377cb4f1733bcec257a0b6d04d94f01486ddb38
 SDL_SHA=83a5d74012311edc3c0d40ea6faecbe57ad692aa033fa5dc273cc937e3938ff2
 
 dl="$out/downloads"
@@ -43,6 +49,8 @@ fetch() {   # fetch NAME URL SHA256: download once, verify every time
 }
 fetch zig-linux.tar.xz "$ZIG_URL" "$ZIG_SHA"
 fetch SDL2-devel-mingw.tar.gz "$SDL_URL" "$SDL_SHA"
+fetch zig-windows.zip "$ZIGWIN_URL" "$ZIGWIN_SHA"
+fetch python-embed.zip "$PY_URL" "$PY_SHA"
 
 tools="$out/tools"
 if [ ! -x "$tools/zig/zig" ]; then
@@ -86,6 +94,26 @@ rm -rf "$out/stage"; mkdir -p "$out/stage/licenses"
 cp "$bld/ct_sdl_engine.exe" "$bld/ct_boot_engine.exe" "$sdl/bin/SDL2.dll" "$out/stage/"
 cp "$bld/libct_sdl_engine.dll.a" "$bld/libct_boot_engine.dll.a" "$out/stage/"
 cp -r "$repo/LICENSES" "$repo/THIRD_PARTY.md" "$out/stage/licenses/"
+
+# The toolchain the package carries, so the player needs nothing installed:
+# zig for Windows (trimmed to compiling and linking C for x86_64-windows-gnu)
+# and the embeddable Python (build_module.py needs only its standard library).
+rm -rf "$out/zigwin-x"
+python3 -c 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])' \
+    "$dl/zig-windows.zip" "$out/zigwin-x"
+sh "$repo/packaging/windows/trim-zig-win.sh" "$out/zigwin-x/zig-x86_64-windows-0.15.2"
+mv "$out/zigwin-x/zig-x86_64-windows-0.15.2" "$out/stage/zig"
+rmdir "$out/zigwin-x"
+mkdir -p "$out/stage/python"
+python3 -c 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])' \
+    "$dl/python-embed.zip" "$out/stage/python"
+# the embeddable build ignores PYTHONPATH and the script folder: the _pth file
+# lists what `import` searches (the zip, this folder, the package's tools)
+printf 'python313.zip\n.\n../tools\n' > "$out/stage/python/python313._pth"
+mkdir -p "$out/stage/tools" "$out/stage/runtime"
+cp "$repo/tools/build_module.py" "$out/stage/tools/"
+cp "$repo"/runtime/*.h "$repo/runtime/module_entry.c" "$out/stage/runtime/"
+cp "$out/ct_engine.def" "$out/stage/"   # the exports the import libraries were made from
 
 rm -f "$out/CT_Recomp-win64.zip"
 python3 - "$out/stage" "$out/CT_Recomp-win64.zip" <<'PY'

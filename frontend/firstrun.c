@@ -1046,7 +1046,11 @@ int firstrun(const firstrun_opts *o)
     /* The module: reuse it if fresh, else build it; a fresh one that won't
        load is rebuilt once. */
     char module[PATHLEN];
+#ifdef _WIN32
+    pref_file(module, sizeof module, "ct_game.dll");   /* tools/build_module.py's name on Windows */
+#else
     pref_file(module, sizeof module, "ct_game.so");
+#endif
     int result = FIRSTRUN_MODULE;
     for (int attempt = 0;; attempt++) {
         int fresh = module_fresh(module);

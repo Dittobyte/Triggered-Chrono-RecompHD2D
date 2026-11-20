@@ -8,7 +8,7 @@
  *
  * Files, in the per-game preferences folder (SDL_GetPrefPath("ct-recomp",
  * GAME_ID)):
- *   ct_game.so     the module (tools/build_module.py --out)
+ *   ct_game.so     the module (tools/build_module.py --out); ct_game.dll on Windows
  *   ct_game.stamp  rom_sha1=HEX and module_abi=N: what it was built from
  *   rom_path       the last ROM that passed the check
  *
