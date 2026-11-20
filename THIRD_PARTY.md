@@ -1,6 +1,6 @@
 # Third-party code and data
 
-This project (chrono-trigger-recomp) is licensed under GPL-3.0-or-later (see `LICENSE`).
+This project (Triggered Chrono) is licensed under GPL-3.0-or-later (see `LICENSE`).
 It is built on **ThisIsAkill/ct-recomp**, imported with its history at commit
 `a6b49257e527d1f219ce6466075b5e035dd8e5f2`. ct-recomp is MIT-licensed
 (`Copyright (c) 2026 Akhil Moola`); its license text is kept as `LICENSES/MIT.txt`.

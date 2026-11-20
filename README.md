@@ -1,3 +1,5 @@
+<p align="center"><img src="packaging/branding/triggered-chrono-stacked.png" alt="Triggered Chrono" width="420"></p>
+
 # Triggered Chrono
 
 **Chrono Trigger, rebuilt as a native PC game from your own copy, with an optional HD-2D look.**
@@ -130,9 +132,31 @@ build/ct_sdl                                 # play (add --hd2d for the HD-2D lo
 Engine only, no ROM (what CI runs): `cmake -S . -B build && cmake --build build -j && ctest --test-dir build -LE rom`.
 More on the programs, tools and layout is in the developer reference at the end of this file.
 
+## Where it started, and what has changed
+
+Triggered Chrono began in late September 2026 from the code of [ct-recomp](https://github.com/ThisIsAkill/ct-recomp) by
+Akhil Moola, as it stood on 2026-09-29 (commit `a6b4925`). Here is what that starting point contained and where this project is now,
+measured on the same repository.
+
+| | At the start (ct-recomp, 2026-09-29) | Now (Triggered Chrono) |
+|---|---|---|
+| Known functions compiled to C | 1,414 of 2,036 (69.4%) | every function found so far: 2,115 (260 labels checked and reclassified as data) |
+| Instructions running as native code, 1500-frame boot | 97.6% | 99.8% |
+| Replays measured | boot only | boot, Leene Square, the first battle, the world map, the field menu: 99.8% to 99.9% native |
+| Automated tests | 67 | about 140 |
+| Files in the repository | 135 | about 570 |
+| Frontend | SDL2 window and input | quick menu, rewind, slow motion, frame step, overlays, save backups, controller layer (glyphs, rumble, Steam Deck and ROG Ally presets), touch, asset and audio packs, HD text, optional HD-2D renderer |
+| Releases | none | three Linux pre-releases (AppImage), a Windows port in progress, Android scaffolding in the tree |
+
+What this does not say: both projects keep moving, and the left column is only what we received. The whole-game native claim is
+still unproven: our recordings reach about two thirds of the known functions, and the SNES picture and sound cores are still
+third-party code that we plan to replace one piece at a time ([docs/GPL-REWRITE.md](docs/GPL-REWRITE.md)). Of the 405 commits in this
+repository, 165 came with the import and 240 were made here.
+
 ## Credits
 
-Built on [ct-recomp](https://github.com/ThisIsAkill/ct-recomp) by Akhil Moola (MIT). Includes the zelda3 SNES core (MIT)
+This project started from [ct-recomp](https://github.com/ThisIsAkill/ct-recomp) by Akhil Moola (MIT, copyright 2026 Akhil Moola);
+his copyright notice and licence stay with every file that came from it ([LICENSES/MIT.txt](LICENSES/MIT.txt), [CREDITS.md](CREDITS.md)). Includes the zelda3 SNES core (MIT)
 and the ares SPC700 core (ISC). Symbol names are partly derived from dscotton/ct_disassembly (public domain) and
 ChronoRET (MIT); [Mesen 2](https://github.com/SourMesen/Mesen2) is used as a reference tool. Thanks to the TASVideos
 community for the input movies we compare against, and to everyone who documented the SNES and this game.
@@ -150,11 +174,6 @@ other, GPL-compatible licences which keep their original notices (see Credits).
 
 The notes below are the engine's own documentation: layout, build options, replays, reference comparison. The recompiler
 and runtime are game-agnostic; everything specific to Chrono Trigger lives in `game/ct/`.
-
-
-Static recompiler for Chrono Trigger (SNES, US 1.0) 65816 code to C, plus a C runtime.
-The recompiler and runtime are game-agnostic; everything specific to Chrono
-Trigger lives in `game/ct/`.
 
 Planned features after boot (MSU-1, achievements, save states, widescreen and
 more) are listed in [ROADMAP.md](ROADMAP.md).
