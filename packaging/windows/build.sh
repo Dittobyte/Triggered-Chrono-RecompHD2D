@@ -89,11 +89,16 @@ rm -f "$bld/ct_sdl_engine.exe" "$bld/ct_boot_engine.exe"
 build
 
 # The Windows package layout is flat (not the Linux install tree): programs,
-# SDL2.dll and the import libraries next to each other, licences in licenses/.
-rm -rf "$out/stage"; mkdir -p "$out/stage/licenses"
+# SDL2.dll and the import libraries next to each other; licences in LICENSES/.
+rm -rf "$out/stage"; mkdir -p "$out/stage/LICENSES"
 cp "$bld/ct_sdl_engine.exe" "$bld/ct_boot_engine.exe" "$sdl/bin/SDL2.dll" "$out/stage/"
 cp "$bld/libct_sdl_engine.dll.a" "$bld/libct_boot_engine.dll.a" "$out/stage/"
-cp -r "$repo/LICENSES" "$repo/THIRD_PARTY.md" "$out/stage/licenses/"
+cp "$repo"/LICENSES/*.txt "$out/stage/LICENSES/"
+cp "$sdl/../LICENSE.txt" "$out/stage/LICENSES/SDL2.txt"
+cp "$repo/LICENSE" "$repo/THIRD_PARTY.md" "$repo/packaging/windows/CREDITS.md" "$out/stage/"
+# the user-facing text without its REUSE header lines, CRLF for Notepad
+grep -v '^SPDX-' "$repo/packaging/windows/README-WINDOWS.txt" | sed '1{/^$/d}' | sed 's/$/\r/' \
+    > "$out/stage/README-WINDOWS.txt"
 
 # The toolchain the package carries, so the player needs nothing installed:
 # zig for Windows (trimmed to compiling and linking C for x86_64-windows-gnu)
@@ -126,15 +131,35 @@ for g in "$repo"/game/*/; do
 done
 cp "$out/ct_engine.def" "$out/stage/"   # the exports the import libraries were made from
 
+# Nothing from running the tools in the stage folder ships.
+find "$out/stage" -name __pycache__ -type d -prune -exec rm -rf {} +
+find "$out/stage" -name '*.pyc' -delete
+
+# The zip: top folder CT_Recomp/, files in sorted order, fixed timestamps and
+# permissions, fixed compression level, so the same inputs give the same bytes
+# (given the same zlib: the exes themselves are deterministic only as far as
+# zig's linker is; see docs/PACKAGING.md).
 rm -f "$out/CT_Recomp-win64.zip"
 python3 - "$out/stage" "$out/CT_Recomp-win64.zip" <<'PY'
 import os, sys, zipfile
 src, dst = sys.argv[1:3]
-with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as z:
-    for root, _, files in os.walk(src):
-        for f in sorted(files):
-            p = os.path.join(root, f)
-            z.write(p, os.path.join("CT_Recomp", os.path.relpath(p, src)))
+names = []
+for root, _, files in os.walk(src):
+    for f in files:
+        p = os.path.join(root, f)
+        names.append(os.path.relpath(p, src).replace(os.sep, "/"))
+names.sort()
+with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+    for n in names:
+        zi = zipfile.ZipInfo("CT_Recomp/" + n, (2026, 1, 1, 0, 0, 0))
+        zi.compress_type = zipfile.ZIP_DEFLATED
+        zi.create_system = 3
+        zi.external_attr = 0o100644 << 16
+        with open(os.path.join(src, n), "rb") as fh:
+            z.writestr(zi, fh.read(), compresslevel=9)
 PY
 ls -l "$out/stage"
+du -sm "$out/stage" | awk '{print "unpacked MB: " $1}'
+ls -l "$out/CT_Recomp-win64.zip" | awk '{print "zip bytes: " $5}'
+sha256sum "$out/CT_Recomp-win64.zip"
 echo WIN-BUILD-OK

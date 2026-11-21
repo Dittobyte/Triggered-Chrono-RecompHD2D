@@ -19,3 +19,11 @@ for d in "$libc"/include/*; do
         *) rm -rf "$d" ;;
     esac
 done
+# clang headers for other CPU families (x86_64 never includes them) and the
+# mingw-w64 32-bit and ARM parts
+inc="$z/lib/include"
+rm -f "$inc"/arm_*.h "$inc"/arm64_*.h "$inc"/altivec.h "$inc"/vecintrin.h "$inc"/msa.h \
+    "$inc"/riscv_*.h "$inc"/sifive_*.h "$inc"/hvx_*.h "$inc"/hexagon_*.h "$inc"/lasxintrin.h \
+    "$inc"/lsxintrin.h "$inc"/wasm_simd128.h "$inc"/spe.h "$inc"/htmintrin.h "$inc"/htmxlintrin.h \
+    "$inc"/ppc_wrappers 2>/dev/null || true
+rm -rf "$inc/ppc_wrappers" "$libc/mingw/lib32" "$libc/mingw/libarm32" "$libc/mingw/libarm64"
